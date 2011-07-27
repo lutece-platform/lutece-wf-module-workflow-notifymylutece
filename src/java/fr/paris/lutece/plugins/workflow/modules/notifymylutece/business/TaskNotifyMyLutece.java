@@ -52,6 +52,7 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -109,16 +110,16 @@ public class TaskNotifyMyLutece extends Task
                 {
                     record.setDirectory( directory );
 
-                    Map<String, String> model = notifyMyLuteceService.fillModel( config, resourceHistory, record,
-                            directory );
+                    String strReceiver = notifyMyLuteceService.getReceiver( config, record.getIdRecord(  ),
+                            directory.getIdDirectory(  ) );
+
+                    Map<String, String> model = notifyMyLuteceService.fillModel( config, record, directory, strReceiver );
                     HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                                 TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
 
                     String strObject = config.getSubject(  );
                     String strMessage = template.getHtml(  );
                     String strSender = config.getSenderName(  );
-                    String strReceiver = notifyMyLuteceService.getReceiver( config, resourceHistory,
-                            record.getIdRecord(  ), directory.getIdDirectory(  ) );
 
                     NotifyMyLuteceWebService.getService(  ).notify( strObject, strMessage, strSender, strReceiver );
                 }
@@ -148,6 +149,8 @@ public class TaskNotifyMyLutece extends Task
             notifyMyLuteceService.getListStates( getAction(  ).getId(  ) ) );
         model.put( NotifyMyLuteceConstants.MARK_LIST_ENTRIES_FREEMARKER,
             notifyMyLuteceService.getListEntries( getId(  ) ) );
+        model.put( NotifyMyLuteceConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
+        model.put( NotifyMyLuteceConstants.MARK_LOCALE, request.getLocale(  ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_MYLUTECE_CONFIG, locale, model );
 

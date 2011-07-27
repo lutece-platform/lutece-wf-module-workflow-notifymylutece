@@ -74,6 +74,8 @@ public final class NotifyMyLuteceConstants
     public static final String MARK_POSITION = "position_";
     public static final String MARK_DIRECTORY_TITLE = "directory_title";
     public static final String MARK_DIRECTORY_DESCRIPTION = "directory_description";
+    public static final String MARK_WEBAPP_URL = "webapp_url";
+    public static final String MARK_LOCALE = "locale";
 
     // PARAMETERS
     public static final String PARAMETER_SUBJECT = "subject";

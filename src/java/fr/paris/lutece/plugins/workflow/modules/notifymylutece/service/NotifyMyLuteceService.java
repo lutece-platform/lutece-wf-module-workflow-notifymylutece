@@ -46,12 +46,12 @@ import fr.paris.lutece.plugins.directory.business.RecordFieldHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.workflow.business.ActionHome;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
 import fr.paris.lutece.plugins.workflow.business.StateFilter;
 import fr.paris.lutece.plugins.workflow.business.StateHome;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
+import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
 import fr.paris.lutece.portal.business.workflow.Action;
 import fr.paris.lutece.portal.business.workflow.State;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -88,34 +88,10 @@ public final class NotifyMyLuteceService
     private NotifyMyLuteceService(  )
     {
         // Init list accepted entry types
-        _listAcceptedEntryTypes = new ArrayList<Integer>(  );
-
-        String strAcceptEntryTypes = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE );
-        String[] listAcceptEntryTypes = strAcceptEntryTypes.split( NotifyMyLuteceConstants.COMMA );
-
-        for ( String strAcceptEntryType : listAcceptEntryTypes )
-        {
-            if ( StringUtils.isNotBlank( strAcceptEntryType ) && StringUtils.isNumeric( strAcceptEntryType ) )
-            {
-                int nAcceptedEntryType = Integer.parseInt( strAcceptEntryType );
-                _listAcceptedEntryTypes.add( nAcceptedEntryType );
-            }
-        }
+        _listAcceptedEntryTypes = fillListEntryTypes( NotifyMyLuteceConstants.PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE );
 
         // Init list refused entry types
-        _listRefusedEntryTypes = new ArrayList<Integer>(  );
-
-        String strRefusedEntryTypes = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE );
-        String[] listRefusedEntryTypes = strRefusedEntryTypes.split( NotifyMyLuteceConstants.COMMA );
-
-        for ( String strRefusedEntryType : listRefusedEntryTypes )
-        {
-            if ( StringUtils.isNotBlank( strRefusedEntryType ) && StringUtils.isNumeric( strRefusedEntryType ) )
-            {
-                int nRefusedEntryType = Integer.parseInt( strRefusedEntryType );
-                _listRefusedEntryTypes.add( nRefusedEntryType );
-            }
-        }
+        _listRefusedEntryTypes = fillListEntryTypes( NotifyMyLuteceConstants.PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE );
     }
 
     /**
@@ -127,6 +103,35 @@ public final class NotifyMyLuteceService
         return (NotifyMyLuteceService) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
             BEAN_NOTIFY_MYLUTECE_SERVICE );
     }
+
+    /**
+     * Fill the list of entry types
+     * @param strPropertyEntryTypes the property containing the entry types
+     * @return a list of integer
+     */
+    public static List<Integer> fillListEntryTypes( String strPropertyEntryTypes )
+    {
+        List<Integer> listEntryTypes = new ArrayList<Integer>(  );
+        String strEntryTypes = AppPropertiesService.getProperty( strPropertyEntryTypes );
+
+        if ( StringUtils.isNotBlank( strEntryTypes ) )
+        {
+            String[] listAcceptEntryTypesForIdDemand = strEntryTypes.split( NotifyMyLuteceConstants.COMMA );
+
+            for ( String strAcceptEntryType : listAcceptEntryTypesForIdDemand )
+            {
+                if ( StringUtils.isNotBlank( strAcceptEntryType ) && StringUtils.isNumeric( strAcceptEntryType ) )
+                {
+                    int nAcceptedEntryType = Integer.parseInt( strAcceptEntryType );
+                    listEntryTypes.add( nAcceptedEntryType );
+                }
+            }
+        }
+
+        return listEntryTypes;
+    }
+
+    // CHECKS
 
     /**
      * Check if the given entry type id is refused
@@ -161,6 +166,8 @@ public final class NotifyMyLuteceService
 
         return bIsAccepted;
     }
+
+    // GETS
 
     /**
      * Get the list of states
@@ -233,19 +240,7 @@ public final class NotifyMyLuteceService
 
                 if ( isEntryTypeAccepted( nIdEntryType ) )
                 {
-                    StringBuilder sbReferenceEntry = new StringBuilder(  );
-                    sbReferenceEntry.append( entry.getPosition(  ) );
-                    sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.OPEN_BRACKET );
-                    sbReferenceEntry.append( I18nService.getLocalizedString( 
-                            NotifyMyLuteceConstants.PROPERTY_LABEL_REFERENCED_ENTRY, locale ) );
-                    sbReferenceEntry.append( entry.getTitle(  ) );
-                    sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.HYPHEN +
-                        NotifyMyLuteceConstants.SPACE );
-                    sbReferenceEntry.append( I18nService.getLocalizedString( 
-                            entry.getEntryType(  ).getTitleI18nKey(  ), locale ) );
-                    sbReferenceEntry.append( NotifyMyLuteceConstants.CLOSED_BRACKET );
-
-                    refenreceListEntries.addItem( entry.getPosition(  ), sbReferenceEntry.toString(  ) );
+                    refenreceListEntries.addItem( entry.getPosition(  ), buildReferenceEntryToString( entry, locale ) );
                 }
             }
         }
@@ -288,46 +283,17 @@ public final class NotifyMyLuteceService
     /**
      * Get the receiver
      * @param config the config
-     * @param resourceHistory the resource history
      * @param nIdRecord the id record
      * @param nIdDirectory the id directory
      * @return the receiver
      */
-    public String getReceiver( TaskNotifyMyLuteceConfig config, ResourceHistory resourceHistory, int nIdRecord,
-        int nIdDirectory )
+    public String getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
     {
         String strReceiver = StringUtils.EMPTY;
-        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
-        // RecordField User Guid
-        EntryFilter entryFilterUserGuid = new EntryFilter(  );
-        entryFilterUserGuid.setPosition( config.getPositionEntryDirectoryUserGuid(  ) );
-        entryFilterUserGuid.setIdDirectory( nIdDirectory );
-
-        List<IEntry> listEntriesUserGuid = EntryHome.getEntryList( entryFilterUserGuid, pluginDirectory );
-
-        if ( ( listEntriesUserGuid != null ) && !listEntriesUserGuid.isEmpty(  ) )
+        if ( config.getPositionEntryDirectoryUserGuid(  ) != DirectoryUtils.CONSTANT_ID_NULL )
         {
-            IEntry entryUserGuid = listEntriesUserGuid.get( 0 );
-            RecordFieldFilter recordFieldFilterEmail = new RecordFieldFilter(  );
-            recordFieldFilterEmail.setIdDirectory( nIdDirectory );
-            recordFieldFilterEmail.setIdEntry( entryUserGuid.getIdEntry(  ) );
-            recordFieldFilterEmail.setIdRecord( nIdRecord );
-
-            List<RecordField> listRecordFieldsUserGuid = RecordFieldHome.getRecordFieldList( recordFieldFilterEmail,
-                    pluginDirectory );
-
-            if ( ( listRecordFieldsUserGuid != null ) && !listRecordFieldsUserGuid.isEmpty(  ) &&
-                    ( listRecordFieldsUserGuid.get( 0 ) != null ) )
-            {
-                RecordField recordFieldUserGuid = listRecordFieldsUserGuid.get( 0 );
-                strReceiver = recordFieldUserGuid.getValue(  );
-
-                if ( recordFieldUserGuid.getField(  ) != null )
-                {
-                    strReceiver = recordFieldUserGuid.getField(  ).getTitle(  );
-                }
-            }
+            strReceiver = getRecordFieldValue( config.getPositionEntryDirectoryUserGuid(  ), nIdRecord, nIdDirectory );
         }
 
         return strReceiver;
@@ -336,13 +302,13 @@ public final class NotifyMyLuteceService
     /**
      * Fill the model for the notification message
      * @param config the config
-     * @param resourceHistory the resource history
      * @param record the record
      * @param directory the directory
+     * @param strReceiver the user guid of the receiver
      * @return the model
      */
-    public Map<String, String> fillModel( TaskNotifyMyLuteceConfig config, ResourceHistory resourceHistory,
-        Record record, Directory directory )
+    public Map<String, String> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
+        String strReceiver )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
@@ -396,6 +362,76 @@ public final class NotifyMyLuteceService
             model.put( NotifyMyLuteceConstants.MARK_STATUS, state.getName(  ) );
         }
 
+        // Fills the model for user attributes
+        WorkflowWebService.getService(  ).fillUserAttributesToModel( model, strReceiver );
+
         return model;
+    }
+
+    /**
+     * Build the reference entry into String
+     * @param entry the entry
+     * @param locale the Locale
+     * @return the reference entry
+     */
+    private String buildReferenceEntryToString( IEntry entry, Locale locale )
+    {
+        StringBuilder sbReferenceEntry = new StringBuilder(  );
+        sbReferenceEntry.append( entry.getPosition(  ) );
+        sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.OPEN_BRACKET );
+        sbReferenceEntry.append( I18nService.getLocalizedString( 
+                NotifyMyLuteceConstants.PROPERTY_LABEL_REFERENCED_ENTRY, locale ) );
+        sbReferenceEntry.append( entry.getTitle(  ) );
+        sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.HYPHEN +
+            NotifyMyLuteceConstants.SPACE );
+        sbReferenceEntry.append( I18nService.getLocalizedString( entry.getEntryType(  ).getTitleI18nKey(  ), locale ) );
+        sbReferenceEntry.append( NotifyMyLuteceConstants.CLOSED_BRACKET );
+
+        return sbReferenceEntry.toString(  );
+    }
+
+    /**
+     * Get the record field value
+     * @param nPosition the position of the entry
+     * @param nIdRecord the id record
+     * @param nIdDirectory the id directory
+     * @return the record field value
+     */
+    private String getRecordFieldValue( int nPosition, int nIdRecord, int nIdDirectory )
+    {
+        String strRecordFieldValue = StringUtils.EMPTY;
+        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+
+        // RecordField
+        EntryFilter entryFilter = new EntryFilter(  );
+        entryFilter.setPosition( nPosition );
+        entryFilter.setIdDirectory( nIdDirectory );
+
+        List<IEntry> listEntries = EntryHome.getEntryList( entryFilter, pluginDirectory );
+
+        if ( ( listEntries != null ) && !listEntries.isEmpty(  ) )
+        {
+            IEntry entry = listEntries.get( 0 );
+            RecordFieldFilter recordFieldFilterEmail = new RecordFieldFilter(  );
+            recordFieldFilterEmail.setIdDirectory( nIdDirectory );
+            recordFieldFilterEmail.setIdEntry( entry.getIdEntry(  ) );
+            recordFieldFilterEmail.setIdRecord( nIdRecord );
+
+            List<RecordField> listRecordFields = RecordFieldHome.getRecordFieldList( recordFieldFilterEmail,
+                    pluginDirectory );
+
+            if ( ( listRecordFields != null ) && !listRecordFields.isEmpty(  ) && ( listRecordFields.get( 0 ) != null ) )
+            {
+                RecordField recordFieldIdDemand = listRecordFields.get( 0 );
+                strRecordFieldValue = recordFieldIdDemand.getValue(  );
+
+                if ( recordFieldIdDemand.getField(  ) != null )
+                {
+                    strRecordFieldValue = recordFieldIdDemand.getField(  ).getTitle(  );
+                }
+            }
+        }
+
+        return strRecordFieldValue;
     }
 }

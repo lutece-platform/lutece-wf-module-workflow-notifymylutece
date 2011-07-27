@@ -1,3 +1,5 @@
+<#include "/admin/util/editor/editor.html" />
+
 <#assign sender_name = default_sender_name>
 <#assign subject = "">
 <#assign message = "">
@@ -48,36 +50,84 @@
 	
 	<p>
 		<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * :</label>
-		<textarea name="message" id="" rows="5" cols="80">${message}</textarea>
+		<div class="editor">
+			<textarea name="message" id="" rows="20" cols="90" class="richtext">${message}</textarea>
+		</div>
 		<br/>
 		<label>&nbsp;</label>
 		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message_comment}
 	</p>
 	
 	<#if config?exists && config.idDirectory!=-1>
-		<br/>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker_status} :  &#36;&#123;status&#125;<br/><br/>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker_directory_title} :  &#36;&#123;directory_title&#125;<br/><br/>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker_directory_description} :  &#36;&#123;directory_description&#125;<br/><br/>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_comment} :  <br/><br/>
-		
-		<table>
-	  		<tr>
-	  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry}</th>
-	  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry_freemarker}</th>
-	  		</tr>
-		 	<#list list_entries_freemarker as entry>
-			  	<tr>
-			  		<td>
-			  			${entry.title}
-			  		</td>
-			  		<td>
-			  			&#36;&#123;position_${entry.position}&#125;
-			  		</td>
-			  	</tr>
-			  </#list>
-		</table>
-		<br>
+		<fieldset>
+			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_comment}</legend>
+			<table>
+				<tr>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory}</th>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_status}</td>
+					<td>&#36;&#123;status&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_title}</td>
+					<td>&#36;&#123;directory_title&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_description}</td>
+					<td>&#36;&#123;directory_description&#125;</td>
+				</tr>
+			</table>
+		</fieldset>	
+		<br />
+		<fieldset>
+			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute_comment}</legend>
+			<table>
+				<tr>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute}</th>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_first_name}</td>
+					<td>&#36;&#123;first_name&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_last_name}</td>
+					<td>&#36;&#123;last_name&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_email}</td>
+					<td>&#36;&#123;email&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_phone_number}</td>
+					<td>&#36;&#123;phone_number&#125;</td>
+				</tr>
+			</table>
+		</fieldset>
+		<br />
+		<fieldset>
+			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry_directory_comment}</legend>
+			<table>
+		  		<tr>
+		  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry}</th>
+		  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+		  		</tr>
+			 	<#list list_entries_freemarker as entry>
+				  	<tr>
+				  		<td>
+				  			${entry.title}
+				  		</td>
+				  		<td>
+				  			&#36;&#123;position_${entry.position}&#125;
+				  		</td>
+				  	</tr>
+				  </#list>
+			</table>
+		</fieldset>
+		<br />
 	</#if>
 </div>
-	
+
+<@initEditor />
