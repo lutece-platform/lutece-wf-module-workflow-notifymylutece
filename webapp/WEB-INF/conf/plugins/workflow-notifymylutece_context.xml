@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<!-- DAO -->
+	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfigDAO"/>
+
+	<!-- Services -->
+	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService"/>
+	<bean id="workflow-notifymylutece.notifyMyLuteceService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceService"/>
+	<bean id="workflow-notifymylutece.notifyMyLuteceWebService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceWebService"/>
+
+	<!-- Tasks -->
+	<bean id="workflow-notifymylutece.taskNotifyMyLutece" class="fr.paris.lutece.plugins.workflow.business.task.TaskType" >
+		<property name="key" value="taskNotifyMyLutece" />
+		<property name="titleI18nKey" value="module.workflow.notifymylutece.task_notify_mylutece_title" />
+		<property name="className" value="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLutece"/>
+	</bean>
+	
+	<!-- SignRequest -->
+    <bean id="workflow-notifymylutece.hashService" class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
+    <bean id="workflow-notifymylutece.requestAuthenticator" class="fr.paris.lutece.util.signrequest.SimpleHashAuthenticator" >
+        <property name="hashService" ref="workflow-notifymylutece.hashService" />
+        <property name="signatureElements" > 
+            <list>
+                <value>notification_object</value>
+                <value>notification_sender</value>
+                <value>notification_receiver</value>
+            </list>
+        </property>
+        <property name="privateKey">
+            <value>change me</value>
+        </property>
+    </bean>
+</beans>
+ 	
