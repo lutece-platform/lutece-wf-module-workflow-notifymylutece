@@ -305,10 +305,11 @@ public final class NotifyMyLuteceService
      * @param record the record
      * @param directory the directory
      * @param strReceiver the user guid of the receiver
+     * @param locale the Locale
      * @return the model
      */
     public Map<String, String> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
-        String strReceiver )
+        String strReceiver, Locale locale )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
@@ -324,9 +325,14 @@ public final class NotifyMyLuteceService
 
         for ( RecordField recordField : listRecordField )
         {
-            String value = recordField.getValue(  );
+            String value = recordField.getEntry(  ).convertRecordFieldValueToString( recordField, locale, false, false );
 
             if ( isEntryTypeRefused( recordField.getEntry(  ).getEntryType(  ).getIdType(  ) ) )
+            {
+                continue;
+            }
+            else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation &&
+                    !recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
             {
                 continue;
             }
@@ -341,11 +347,6 @@ public final class NotifyMyLuteceService
                 {
                     value = listRecordField.get( 0 ).getField(  ).getTitle(  );
                 }
-            }
-            else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation &&
-                    !recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
-            {
-                continue;
             }
 
             recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ), pluginDirectory ) );

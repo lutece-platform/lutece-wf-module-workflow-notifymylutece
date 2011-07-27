@@ -113,7 +113,8 @@ public class TaskNotifyMyLutece extends Task
                     String strReceiver = notifyMyLuteceService.getReceiver( config, record.getIdRecord(  ),
                             directory.getIdDirectory(  ) );
 
-                    Map<String, String> model = notifyMyLuteceService.fillModel( config, record, directory, strReceiver );
+                    Map<String, String> model = notifyMyLuteceService.fillModel( config, record, directory,
+                            strReceiver, request.getLocale(  ) );
                     HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                                 TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
 
