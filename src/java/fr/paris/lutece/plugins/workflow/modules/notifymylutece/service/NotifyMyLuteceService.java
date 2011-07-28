@@ -380,8 +380,6 @@ public final class NotifyMyLuteceService
         StringBuilder sbReferenceEntry = new StringBuilder(  );
         sbReferenceEntry.append( entry.getPosition(  ) );
         sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.OPEN_BRACKET );
-        sbReferenceEntry.append( I18nService.getLocalizedString( 
-                NotifyMyLuteceConstants.PROPERTY_LABEL_REFERENCED_ENTRY, locale ) );
         sbReferenceEntry.append( entry.getTitle(  ) );
         sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.HYPHEN +
             NotifyMyLuteceConstants.SPACE );
