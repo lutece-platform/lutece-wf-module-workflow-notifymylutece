@@ -157,7 +157,7 @@ public final class NotifyMyLuteceService
      */
     public boolean isEntryTypeAccepted( int nIdEntryType )
     {
-        boolean bIsAccepted = true;
+        boolean bIsAccepted = false;
 
         if ( ( _listAcceptedEntryTypes != null ) && !_listAcceptedEntryTypes.isEmpty(  ) )
         {
