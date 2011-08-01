@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.signrequest;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.signrequest;
 
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.signrequest.RequestAuthenticator;
@@ -42,14 +42,14 @@ import fr.paris.lutece.util.signrequest.RequestAuthenticator;
  * NotifyCRMRequestAuthenticator
  *
  */
-public final class NotifyMyLuteceRequestAuthenticator
+public final class NotifyMyLuteceRequestAuthenticatorService
 {
     private static final String BEAN_NOTIFYMYLTUECE_REQUESTAUTHENTICATOR = "workflow-notifymylutece.requestAuthenticator";
 
     /**
      * Private constructor
      */
-    private NotifyMyLuteceRequestAuthenticator(  )
+    private NotifyMyLuteceRequestAuthenticatorService(  )
     {
     }
 

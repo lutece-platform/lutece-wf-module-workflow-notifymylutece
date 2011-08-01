@@ -33,8 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
 
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.signrequest.NotifyMyLuteceRequestAuthenticatorService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.signrequest.NotifyMyLuteceRequestAuthenticator;
 import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -104,8 +104,8 @@ public final class NotifyMyLuteceWebService
             try
             {
                 HttpAccess httpAccess = new HttpAccess(  );
-                httpAccess.doPost( strUrl, params, NotifyMyLuteceRequestAuthenticator.getRequestAuthenticator(  ),
-                    listElements );
+                httpAccess.doPost( strUrl, params,
+                    NotifyMyLuteceRequestAuthenticatorService.getRequestAuthenticator(  ), listElements );
             }
             catch ( HttpAccessException e )
             {
