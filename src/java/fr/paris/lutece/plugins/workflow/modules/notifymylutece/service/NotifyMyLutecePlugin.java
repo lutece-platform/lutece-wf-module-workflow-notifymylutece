@@ -43,7 +43,7 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
  */
 public class NotifyMyLutecePlugin extends PluginDefaultImplementation
 {
-    public static final String PLUGIN_NAME = "notifymylutece";
+    public static final String PLUGIN_NAME = "workflow-notifymylutece";
 
     /**
      * Initialise the NotifyMyLutecePlugin
