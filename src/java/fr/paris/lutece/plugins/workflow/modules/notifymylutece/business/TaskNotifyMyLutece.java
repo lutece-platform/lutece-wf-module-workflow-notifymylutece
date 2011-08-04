@@ -146,8 +146,6 @@ public class TaskNotifyMyLutece extends Task
         model.put( NotifyMyLuteceConstants.MARK_DEFAULT_SENDER_NAME, strDefaultSenderName );
         model.put( NotifyMyLuteceConstants.MARK_LIST_ENTRIES, notifyMyLuteceService.getListEntries( getId(  ), locale ) );
         model.put( NotifyMyLuteceConstants.MARK_LIST_DIRECTORIES, notifyMyLuteceService.getListDirectories(  ) );
-        model.put( NotifyMyLuteceConstants.MARK_LIST_STATES,
-            notifyMyLuteceService.getListStates( getAction(  ).getId(  ) ) );
         model.put( NotifyMyLuteceConstants.MARK_LIST_ENTRIES_FREEMARKER,
             notifyMyLuteceService.getListEntries( getId(  ) ) );
         model.put( NotifyMyLuteceConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );

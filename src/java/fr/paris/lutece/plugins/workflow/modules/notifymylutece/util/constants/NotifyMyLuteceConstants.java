@@ -64,7 +64,6 @@ public final class NotifyMyLuteceConstants
 
     // MARKS
     public static final String MARK_CONFIG = "config";
-    public static final String MARK_LIST_STATES = "list_states";
     public static final String MARK_LIST_ENTRIES = "list_entries";
     public static final String MARK_LIST_DIRECTORIES = "list_directories";
     public static final String MARK_LIST_ENTRIES_FREEMARKER = "list_entries_freemarker";
