@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
 
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.signrequest.NotifyMyLuteceRequestAuthenticatorService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
-import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
+import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -83,10 +83,9 @@ public final class NotifyMyLuteceWebService
      */
     public void notify( String strObject, String strMessage, String strSender, String strReceiver )
     {
-        if ( WorkflowWebService.isUserAttributeWSActive(  ) )
+        if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) )
         {
-            String strUrl = WorkflowWebService.getRestUserAttributeWebappUrl(  ) +
-                NotifyMyLuteceConstants.URL_REST_NOTIFY;
+            String strUrl = "http://localhost:8080/lutece" + NotifyMyLuteceConstants.URL_REST_NOTIFY;
 
             // List parameters to post
             Map<String, String> params = new HashMap<String, String>(  );

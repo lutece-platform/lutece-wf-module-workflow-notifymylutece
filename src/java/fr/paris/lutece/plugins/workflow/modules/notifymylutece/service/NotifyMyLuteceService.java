@@ -50,13 +50,14 @@ import fr.paris.lutece.plugins.workflow.business.task.TaskHome;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
+import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
 import fr.paris.lutece.portal.business.workflow.State;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
@@ -286,12 +287,12 @@ public final class NotifyMyLuteceService
      * @param nIdHistory the id history
      * @return the model
      */
-    public Map<String, String> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
+    public Map<String, Object> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
         String strReceiver, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
-        Map<String, String> model = new HashMap<String, String>(  );
+        Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( NotifyMyLuteceConstants.MARK_MESSAGE, config.getMessage(  ) );
         model.put( NotifyMyLuteceConstants.MARK_DIRECTORY_TITLE, directory.getTitle(  ) );
         model.put( NotifyMyLuteceConstants.MARK_DIRECTORY_DESCRIPTION, directory.getDescription(  ) );
@@ -343,7 +344,7 @@ public final class NotifyMyLuteceService
         }
 
         // Fills the model for user attributes
-        WorkflowWebService.getService(  ).fillUserAttributesToModel( model, strReceiver );
+        fillModelWithUserAttributes( model, strReceiver );
 
         // Fill the model with the info of other tasks
         for ( ITask task : getListTasks( nIdAction, request.getLocale(  ) ) )
@@ -425,6 +426,33 @@ public final class NotifyMyLuteceService
         }
 
         return strRecordFieldValue;
+    }
+
+    /**
+     * Fills the model with user attributes
+     * @param model the model
+     * @param strUserGuid the user guid
+     */
+    private void fillModelWithUserAttributes( Map<String, Object> model, String strUserGuid )
+    {
+        if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) )
+        {
+            Map<String, String> mapUserAttributes = WorkflowUserAttributesManager.getManager(  )
+                                                                                 .getAttributes( strUserGuid );
+            String strFirstName = mapUserAttributes.get( LuteceUser.NAME_GIVEN );
+            String strLastName = mapUserAttributes.get( LuteceUser.NAME_FAMILY );
+            String strEmail = mapUserAttributes.get( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );
+            String strPhoneNumber = mapUserAttributes.get( LuteceUser.BUSINESS_INFO_TELECOM_TELEPHONE_NUMBER );
+
+            model.put( NotifyMyLuteceConstants.MARK_FIRST_NAME,
+                StringUtils.isNotEmpty( strFirstName ) ? strFirstName : StringUtils.EMPTY );
+            model.put( NotifyMyLuteceConstants.MARK_LAST_NAME,
+                StringUtils.isNotEmpty( strLastName ) ? strLastName : StringUtils.EMPTY );
+            model.put( NotifyMyLuteceConstants.MARK_EMAIL,
+                StringUtils.isNotEmpty( strEmail ) ? strEmail : StringUtils.EMPTY );
+            model.put( NotifyMyLuteceConstants.MARK_PHONE_NUMBER,
+                StringUtils.isNotEmpty( strPhoneNumber ) ? strPhoneNumber : StringUtils.EMPTY );
+        }
     }
 
     /**
