@@ -45,14 +45,14 @@ import fr.paris.lutece.plugins.directory.business.RecordFieldFilter;
 import fr.paris.lutece.plugins.directory.business.RecordFieldHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
-import fr.paris.lutece.plugins.workflow.business.ActionHome;
-import fr.paris.lutece.plugins.workflow.business.StateFilter;
-import fr.paris.lutece.plugins.workflow.business.StateHome;
+import fr.paris.lutece.plugins.workflow.business.task.ITask;
+import fr.paris.lutece.plugins.workflow.business.task.TaskHome;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
-import fr.paris.lutece.portal.business.workflow.Action;
+import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
+import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
 import fr.paris.lutece.portal.business.workflow.State;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -69,6 +69,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -279,11 +281,13 @@ public final class NotifyMyLuteceService
      * @param record the record
      * @param directory the directory
      * @param strReceiver the user guid of the receiver
-     * @param locale the Locale
+     * @param request the HTTP requset
+     * @param nIdAction the id action
+     * @param nIdHistory the id history
      * @return the model
      */
     public Map<String, String> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
-        String strReceiver, Locale locale )
+        String strReceiver, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
@@ -299,7 +303,8 @@ public final class NotifyMyLuteceService
 
         for ( RecordField recordField : listRecordField )
         {
-            String value = recordField.getEntry(  ).convertRecordFieldValueToString( recordField, locale, false, false );
+            String value = recordField.getEntry(  )
+                                      .convertRecordFieldValueToString( recordField, request.getLocale(  ), false, false );
 
             if ( isEntryTypeRefused( recordField.getEntry(  ).getEntryType(  ).getIdType(  ) ) )
             {
@@ -340,27 +345,41 @@ public final class NotifyMyLuteceService
         // Fills the model for user attributes
         WorkflowWebService.getService(  ).fillUserAttributesToModel( model, strReceiver );
 
+        // Fill the model with the info of other tasks
+        for ( ITask task : getListTasks( nIdAction, request.getLocale(  ) ) )
+        {
+            model.put( NotifyMyLuteceConstants.MARK_TASK + task.getId(  ),
+                TaskInfoManager.getManager(  ).getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
+        }
+
         return model;
     }
 
     /**
-     * Build the reference entry into String
-     * @param entry the entry
-     * @param locale the Locale
-     * @return the reference entry
+     * Get the list of tasks
+     * @param nIdAction the id action
+     * @param locale the locale
+     * @return a list of {@link ITask}
      */
-    private String buildReferenceEntryToString( IEntry entry, Locale locale )
+    public List<ITask> getListTasks( int nIdAction, Locale locale )
     {
-        StringBuilder sbReferenceEntry = new StringBuilder(  );
-        sbReferenceEntry.append( entry.getPosition(  ) );
-        sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.OPEN_BRACKET );
-        sbReferenceEntry.append( entry.getTitle(  ) );
-        sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.HYPHEN +
-            NotifyMyLuteceConstants.SPACE );
-        sbReferenceEntry.append( I18nService.getLocalizedString( entry.getEntryType(  ).getTitleI18nKey(  ), locale ) );
-        sbReferenceEntry.append( NotifyMyLuteceConstants.CLOSED_BRACKET );
+        List<ITask> listTasks = new ArrayList<ITask>(  );
+        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
-        return sbReferenceEntry.toString(  );
+        for ( ITask task : TaskHome.getListTaskByIdAction( nIdAction, pluginWorkflow, locale ) )
+        {
+            for ( ITaskInfoProvider provider : TaskInfoManager.getManager(  ).getProvidersList(  ) )
+            {
+                if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
+                {
+                    listTasks.add( task );
+
+                    break;
+                }
+            }
+        }
+
+        return listTasks;
     }
 
     /**
@@ -406,5 +425,25 @@ public final class NotifyMyLuteceService
         }
 
         return strRecordFieldValue;
+    }
+
+    /**
+     * Build the reference entry into String
+     * @param entry the entry
+     * @param locale the Locale
+     * @return the reference entry
+     */
+    private String buildReferenceEntryToString( IEntry entry, Locale locale )
+    {
+        StringBuilder sbReferenceEntry = new StringBuilder(  );
+        sbReferenceEntry.append( entry.getPosition(  ) );
+        sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.OPEN_BRACKET );
+        sbReferenceEntry.append( entry.getTitle(  ) );
+        sbReferenceEntry.append( NotifyMyLuteceConstants.SPACE + NotifyMyLuteceConstants.HYPHEN +
+            NotifyMyLuteceConstants.SPACE );
+        sbReferenceEntry.append( I18nService.getLocalizedString( entry.getEntryType(  ).getTitleI18nKey(  ), locale ) );
+        sbReferenceEntry.append( NotifyMyLuteceConstants.CLOSED_BRACKET );
+
+        return sbReferenceEntry.toString(  );
     }
 }

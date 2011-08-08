@@ -46,6 +46,7 @@ import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyL
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceWebService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
+import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -114,7 +115,7 @@ public class TaskNotifyMyLutece extends Task
                             directory.getIdDirectory(  ) );
 
                     Map<String, String> model = notifyMyLuteceService.fillModel( config, record, directory,
-                            strReceiver, request.getLocale(  ) );
+                            strReceiver, request, getAction(  ).getId(  ), nIdResourceHistory );
                     HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                                 TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
 
@@ -139,6 +140,7 @@ public class TaskNotifyMyLutece extends Task
         TaskNotifyMyLuteceConfigService configService = TaskNotifyMyLuteceConfigService.getService(  );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_DEFAULT_SENDER_NAME );
+        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
 
@@ -150,6 +152,9 @@ public class TaskNotifyMyLutece extends Task
             notifyMyLuteceService.getListEntries( getId(  ) ) );
         model.put( NotifyMyLuteceConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( NotifyMyLuteceConstants.MARK_LOCALE, request.getLocale(  ) );
+        model.put( NotifyMyLuteceConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
+        model.put( NotifyMyLuteceConstants.MARK_TASKS_LIST,
+            notifyMyLuteceService.getListTasks( getAction(  ).getId(  ), locale ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_MYLUTECE_CONFIG, locale, model );
 
