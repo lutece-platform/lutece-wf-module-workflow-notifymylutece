@@ -107,33 +107,6 @@ public final class NotifyMyLuteceService
             BEAN_NOTIFY_MYLUTECE_SERVICE );
     }
 
-    /**
-     * Fill the list of entry types
-     * @param strPropertyEntryTypes the property containing the entry types
-     * @return a list of integer
-     */
-    public static List<Integer> fillListEntryTypes( String strPropertyEntryTypes )
-    {
-        List<Integer> listEntryTypes = new ArrayList<Integer>(  );
-        String strEntryTypes = AppPropertiesService.getProperty( strPropertyEntryTypes );
-
-        if ( StringUtils.isNotBlank( strEntryTypes ) )
-        {
-            String[] listAcceptEntryTypesForIdDemand = strEntryTypes.split( NotifyMyLuteceConstants.COMMA );
-
-            for ( String strAcceptEntryType : listAcceptEntryTypesForIdDemand )
-            {
-                if ( StringUtils.isNotBlank( strAcceptEntryType ) && StringUtils.isNumeric( strAcceptEntryType ) )
-                {
-                    int nAcceptedEntryType = Integer.parseInt( strAcceptEntryType );
-                    listEntryTypes.add( nAcceptedEntryType );
-                }
-            }
-        }
-
-        return listEntryTypes;
-    }
-
     // CHECKS
 
     /**
@@ -277,6 +250,35 @@ public final class NotifyMyLuteceService
     }
 
     /**
+     * Get the list of tasks
+     * @param nIdAction the id action
+     * @param locale the locale
+     * @return a list of {@link ITask}
+     */
+    public List<ITask> getListTasks( int nIdAction, Locale locale )
+    {
+        List<ITask> listTasks = new ArrayList<ITask>(  );
+        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
+
+        for ( ITask task : TaskHome.getListTaskByIdAction( nIdAction, pluginWorkflow, locale ) )
+        {
+            for ( ITaskInfoProvider provider : TaskInfoManager.getManager(  ).getProvidersList(  ) )
+            {
+                if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
+                {
+                    listTasks.add( task );
+
+                    break;
+                }
+            }
+        }
+
+        return listTasks;
+    }
+
+    // OTHERS
+
+    /**
      * Fill the model for the notification message
      * @param config the config
      * @param record the record
@@ -290,6 +292,7 @@ public final class NotifyMyLuteceService
     public Map<String, Object> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
         String strReceiver, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
+        Locale locale = getLocale( request );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
@@ -304,8 +307,7 @@ public final class NotifyMyLuteceService
 
         for ( RecordField recordField : listRecordField )
         {
-            String value = recordField.getEntry(  )
-                                      .convertRecordFieldValueToString( recordField, request.getLocale(  ), false, false );
+            String value = recordField.getEntry(  ).convertRecordFieldValueToString( recordField, locale, false, false );
 
             if ( isEntryTypeRefused( recordField.getEntry(  ).getEntryType(  ).getIdType(  ) ) )
             {
@@ -347,7 +349,7 @@ public final class NotifyMyLuteceService
         fillModelWithUserAttributes( model, strReceiver );
 
         // Fill the model with the info of other tasks
-        for ( ITask task : getListTasks( nIdAction, request.getLocale(  ) ) )
+        for ( ITask task : getListTasks( nIdAction, locale ) )
         {
             model.put( NotifyMyLuteceConstants.MARK_TASK + task.getId(  ),
                 TaskInfoManager.getManager(  ).getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
@@ -356,32 +358,7 @@ public final class NotifyMyLuteceService
         return model;
     }
 
-    /**
-     * Get the list of tasks
-     * @param nIdAction the id action
-     * @param locale the locale
-     * @return a list of {@link ITask}
-     */
-    public List<ITask> getListTasks( int nIdAction, Locale locale )
-    {
-        List<ITask> listTasks = new ArrayList<ITask>(  );
-        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-
-        for ( ITask task : TaskHome.getListTaskByIdAction( nIdAction, pluginWorkflow, locale ) )
-        {
-            for ( ITaskInfoProvider provider : TaskInfoManager.getManager(  ).getProvidersList(  ) )
-            {
-                if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
-                {
-                    listTasks.add( task );
-
-                    break;
-                }
-            }
-        }
-
-        return listTasks;
-    }
+    // PRIVATE METHODS
 
     /**
      * Get the record field value
@@ -429,6 +406,27 @@ public final class NotifyMyLuteceService
     }
 
     /**
+     * Get the locale
+     * @param request the HTTP request
+     * @return the locale
+     */
+    private Locale getLocale( HttpServletRequest request )
+    {
+        Locale locale = null;
+
+        if ( request != null )
+        {
+            locale = request.getLocale(  );
+        }
+        else
+        {
+            locale = I18nService.getDefaultLocale(  );
+        }
+
+        return locale;
+    }
+
+    /**
      * Fills the model with user attributes
      * @param model the model
      * @param strUserGuid the user guid
@@ -473,5 +471,32 @@ public final class NotifyMyLuteceService
         sbReferenceEntry.append( NotifyMyLuteceConstants.CLOSED_BRACKET );
 
         return sbReferenceEntry.toString(  );
+    }
+
+    /**
+     * Fill the list of entry types
+     * @param strPropertyEntryTypes the property containing the entry types
+     * @return a list of integer
+     */
+    private static List<Integer> fillListEntryTypes( String strPropertyEntryTypes )
+    {
+        List<Integer> listEntryTypes = new ArrayList<Integer>(  );
+        String strEntryTypes = AppPropertiesService.getProperty( strPropertyEntryTypes );
+
+        if ( StringUtils.isNotBlank( strEntryTypes ) )
+        {
+            String[] listAcceptEntryTypesForIdDemand = strEntryTypes.split( NotifyMyLuteceConstants.COMMA );
+
+            for ( String strAcceptEntryType : listAcceptEntryTypesForIdDemand )
+            {
+                if ( StringUtils.isNotBlank( strAcceptEntryType ) && StringUtils.isNumeric( strAcceptEntryType ) )
+                {
+                    int nAcceptedEntryType = Integer.parseInt( strAcceptEntryType );
+                    listEntryTypes.add( nAcceptedEntryType );
+                }
+            }
+        }
+
+        return listEntryTypes;
     }
 }
