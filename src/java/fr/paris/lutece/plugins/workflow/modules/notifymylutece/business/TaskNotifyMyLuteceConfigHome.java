@@ -49,7 +49,7 @@ import java.util.List;
 public final class TaskNotifyMyLuteceConfigHome
 {
     private static final String BEAN_TASK_NOTIFY_MYLUTECE_CONFIG_DAO = "workflow-notifymylutece.taskNotifyMyLuteceConfigDAO";
-    private static final Plugin _plugin = PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME );
+    private static Plugin _plugin = PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME );
     private static ITaskNotifyMyLuteceConfigDAO _dao = (ITaskNotifyMyLuteceConfigDAO) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
             BEAN_TASK_NOTIFY_MYLUTECE_CONFIG_DAO );
 
