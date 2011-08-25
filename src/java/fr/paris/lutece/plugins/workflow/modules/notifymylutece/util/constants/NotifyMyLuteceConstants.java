@@ -100,6 +100,7 @@ public final class NotifyMyLuteceConstants
 
     // URL
     public static final String URL_REST_NOTIFY = "/rest/mylutece-notification/notify";
+    public static final String PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL = "workflow-notifymylutece.rest.myluteceNotification.webapp.url";
 
     /**
      * Private constructor
