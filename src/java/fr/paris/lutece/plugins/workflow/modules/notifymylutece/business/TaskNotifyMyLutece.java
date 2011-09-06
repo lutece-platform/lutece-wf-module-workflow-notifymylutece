@@ -119,7 +119,8 @@ public class TaskNotifyMyLutece extends Task
                     HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                                 TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
 
-                    String strObject = config.getSubject(  );
+                    String strObject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model )
+                                                         .getHtml(  );
                     String strMessage = template.getHtml(  );
                     String strSender = config.getSenderName(  );
 
