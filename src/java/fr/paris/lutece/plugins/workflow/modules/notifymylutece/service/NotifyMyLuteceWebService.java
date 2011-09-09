@@ -86,7 +86,8 @@ public final class NotifyMyLuteceWebService
     {
         if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) )
         {
-        	String strUrl = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL )  + NotifyMyLuteceConstants.URL_REST_NOTIFY;
+            String strUrl = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL ) +
+                NotifyMyLuteceConstants.URL_REST_NOTIFY;
 
             // List parameters to post
             Map<String, String> params = new HashMap<String, String>(  );
