@@ -35,6 +35,9 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
 
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfigHome;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeHome;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeHome;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.user.MyLuteceUserGuidHome;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.List;
@@ -75,6 +78,21 @@ public final class TaskNotifyMyLuteceConfigService
         if ( config != null )
         {
             TaskNotifyMyLuteceConfigHome.create( config );
+
+            for ( int nIdNotificationType : config.getListIdsNotificationType(  ) )
+            {
+                NotificationTypeHome.create( config.getIdTask(  ), nIdNotificationType );
+            }
+
+            for ( int nIdRetrievalType : config.getListIdsRetrievalType(  ) )
+            {
+                RetrievalTypeHome.create( config.getIdTask(  ), nIdRetrievalType );
+            }
+
+            for ( String strUserGuid : config.getListUserGuid(  ) )
+            {
+                MyLuteceUserGuidHome.create( config.getIdTask(  ), strUserGuid );
+            }
         }
     }
 
@@ -87,6 +105,26 @@ public final class TaskNotifyMyLuteceConfigService
         if ( config != null )
         {
             TaskNotifyMyLuteceConfigHome.update( config );
+            NotificationTypeHome.remove( config.getIdTask(  ) );
+
+            for ( int nIdNotificationType : config.getListIdsNotificationType(  ) )
+            {
+                NotificationTypeHome.create( config.getIdTask(  ), nIdNotificationType );
+            }
+
+            RetrievalTypeHome.remove( config.getIdTask(  ) );
+
+            for ( int nIdRetrievalType : config.getListIdsRetrievalType(  ) )
+            {
+                RetrievalTypeHome.create( config.getIdTask(  ), nIdRetrievalType );
+            }
+
+            MyLuteceUserGuidHome.remove( config.getIdTask(  ) );
+
+            for ( String strUserGuid : config.getListUserGuid(  ) )
+            {
+                MyLuteceUserGuidHome.create( config.getIdTask(  ), strUserGuid );
+            }
         }
     }
 
@@ -97,6 +135,9 @@ public final class TaskNotifyMyLuteceConfigService
     public void remove( int nIdTask )
     {
         TaskNotifyMyLuteceConfigHome.remove( nIdTask );
+        NotificationTypeHome.remove( nIdTask );
+        RetrievalTypeHome.remove( nIdTask );
+        MyLuteceUserGuidHome.remove( nIdTask );
     }
 
     /**
@@ -106,7 +147,16 @@ public final class TaskNotifyMyLuteceConfigService
      */
     public TaskNotifyMyLuteceConfig findByPrimaryKey( int nIdTask )
     {
-        return TaskNotifyMyLuteceConfigHome.findByPrimaryKey( nIdTask );
+        TaskNotifyMyLuteceConfig config = TaskNotifyMyLuteceConfigHome.findByPrimaryKey( nIdTask );
+
+        if ( config != null )
+        {
+            config.setListIdsNotificationType( NotificationTypeHome.find( nIdTask ) );
+            config.setListIdsRetrievalType( RetrievalTypeHome.find( nIdTask ) );
+            config.setListUserGuid( MyLuteceUserGuidHome.find( config.getIdTask(  ) ) );
+        }
+
+        return config;
     }
 
     /**
@@ -115,6 +165,18 @@ public final class TaskNotifyMyLuteceConfigService
      */
     public List<TaskNotifyMyLuteceConfig> findAll(  )
     {
-        return TaskNotifyMyLuteceConfigHome.findAll(  );
+        List<TaskNotifyMyLuteceConfig> listConfigs = TaskNotifyMyLuteceConfigHome.findAll(  );
+
+        for ( TaskNotifyMyLuteceConfig config : listConfigs )
+        {
+            if ( config != null )
+            {
+                config.setListIdsNotificationType( NotificationTypeHome.find( config.getIdTask(  ) ) );
+                config.setListIdsRetrievalType( RetrievalTypeHome.find( config.getIdTask(  ) ) );
+                config.setListUserGuid( MyLuteceUserGuidHome.find( config.getIdTask(  ) ) );
+            }
+        }
+
+        return listConfigs;
     }
 }

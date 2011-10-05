@@ -4,6 +4,9 @@
 <beans>
 	<!-- DAO -->
 	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfigDAO"/>
+	<bean id="workflow-notifymylutece.notificationTypeDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeDAO"/>
+	<bean id="workflow-notifymylutece.retrievalTypeDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeDAO"/>
+	<bean id="workflow-notifymylutece.myLuteceUserGuidDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.user.MyLuteceUserGuidDAO"/>
 
 	<!-- Services -->
 	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService"/>
@@ -15,6 +18,42 @@
 		<property name="key" value="taskNotifyMyLutece" />
 		<property name="titleI18nKey" value="module.workflow.notifymylutece.task_notify_mylutece_title" />
 		<property name="className" value="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLutece"/>
+	</bean>
+	
+	<!-- Notification type -->
+	<bean id="workflow-notifymylutece.notificationTypeEmail" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeEmail">
+		<property name="idType" value="1" />
+		<property name="titleKey" value="module.workflow.notifymylutece.notification_type.email" />
+	</bean>
+	<bean id="workflow-notifymylutece.notificationTypeWS" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeWS">
+		<property name="idType" value="2" />
+		<property name="titleKey" value="module.workflow.notifymylutece.notification_type.ws" />
+	</bean>
+	<bean id="workflow-notifymylutece.notificationTypeFactory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory">
+		<property name="notificationTypes">
+			<map>
+				<entry key="1" value-ref="workflow-notifymylutece.notificationTypeEmail" />
+				<entry key="2" value-ref="workflow-notifymylutece.notificationTypeWS" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- Retrieval type -->
+	<bean id="workflow-notifymylutece.retrievalTypeDirectory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeDirectory">
+		<property name="idType" value="1" />
+		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.directory" />
+	</bean>
+	<bean id="workflow-notifymylutece.retrievalTypeUsersList" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeUsersList">
+		<property name="idType" value="2" />
+		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.users_list" />
+	</bean>
+	<bean id="workflow-notifymylutece.retrievalTypeFactory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory">
+		<property name="retrievalTypes">
+			<map>
+				<entry key="1" value-ref="workflow-notifymylutece.retrievalTypeDirectory" />
+				<entry key="2" value-ref="workflow-notifymylutece.retrievalTypeUsersList" />
+			</map>
+		</property>
 	</bean>
 	
 	<!-- SignRequest -->

@@ -60,7 +60,11 @@ public final class NotifyMyLuteceConstants
     public static final String PROPERTY_LABEL_SENDER_NAME = "module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name";
     public static final String PROPERTY_LABEL_SUBJECT = "module.workflow.notifymylutece.task_notify_mylutece_config.label_subject";
     public static final String PROPERTY_LABEL_MESSAGE = "module.workflow.notifymylutece.task_notify_mylutece_config.label_message";
-    public static final String PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_REST_URL = "workflow-notifymylutece.webapp.myluteceNotification.rest.url";
+    public static final String PROPERTY_LABEL_NOTIFICATION_TYPE = "module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type";
+    public static final String PROPERTY_LABEL_RETRIEVAL_TYPE = "module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type";
+    public static final String PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_NOTIFY = "workflow-notifymylutece.rest.myluteceNotification.notify";
+    public static final String PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL = "workflow-notifymylutece.rest.myluteceNotification.webapp.url";
+    public static final String PROPERTY_LUTECEUSER_ATTRIBUTE_EMAIL = "workflow-notifymylutece.luteceUser.attribute.email";
 
     // MARKS
     public static final String MARK_CONFIG = "config";
@@ -82,6 +86,11 @@ public final class NotifyMyLuteceConstants
     public static final String MARK_LAST_NAME = "last_name";
     public static final String MARK_EMAIL = "email";
     public static final String MARK_PHONE_NUMBER = "phone_number";
+    public static final String MARK_IS_USER_ATTRIBUTE_WS_ACTIVE = "is_user_attribute_ws_active";
+    public static final String MARK_NOTIFICATION_TYPES = "notification_types";
+    public static final String MARK_RETRIEVAL_TYPES = "retrieval_types";
+    public static final String MARK_AVAILABLE_USERS_LIST = "available_users_list";
+    public static final String MARK_SELECTED_USERS_LIST = "selected_users_list";
 
     // PARAMETERS
     public static final String PARAMETER_SUBJECT = "subject";
@@ -94,13 +103,13 @@ public final class NotifyMyLuteceConstants
     public static final String PARAMETER_NOTIFICATION_MESSAGE = "notification_message";
     public static final String PARAMETER_NOTIFICATION_SENDER = "notification_sender";
     public static final String PARAMETER_NOTIFICATION_RECEIVER = "notification_receiver";
+    public static final String PARAMETER_NOTIFICATION_TYPE = "notification_type";
+    public static final String PARAMETER_RETRIEVAL_TYPE = "retrieval_type";
+    public static final String PARAMETER_SELECT_USERS = "select_users";
+    public static final String PARAMETER_UNSELECT_USERS = "unselect_users";
 
     // MESSAGES
     public static final String MESSAGE_MANDATORY_FIELD = "module.workflow.notifymylutece.message.mandatoryField";
-
-    // URL
-    public static final String URL_REST_NOTIFY = "/rest/mylutece-notification/notify";
-    public static final String PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL = "workflow-notifymylutece.rest.myluteceNotification.webapp.url";
 
     /**
      * Private constructor

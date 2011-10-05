@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
 
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.signrequest.NotifyMyLuteceRequestAuthenticatorService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
-import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -84,41 +83,33 @@ public final class NotifyMyLuteceWebService
      */
     public void notify( String strObject, String strMessage, String strSender, String strReceiver )
     {
-        if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) )
+        String strUrl = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL ) +
+            AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_NOTIFY );
+
+        // List parameters to post
+        Map<String, String> params = new HashMap<String, String>(  );
+        params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_OBJECT, strObject );
+        params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_MESSAGE, strMessage );
+        params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_SENDER, strSender );
+        params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_RECEIVER, strReceiver );
+
+        // List elements to include to the signature
+        List<String> listElements = new ArrayList<String>(  );
+        listElements.add( strObject );
+        listElements.add( strSender );
+        listElements.add( strReceiver );
+
+        try
         {
-            String strUrl = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_WEBSERVICE_MYLUTECE_NOTIFICATION_WEBAPP_URL ) +
-                NotifyMyLuteceConstants.URL_REST_NOTIFY;
-
-            // List parameters to post
-            Map<String, String> params = new HashMap<String, String>(  );
-            params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_OBJECT, strObject );
-            params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_MESSAGE, strMessage );
-            params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_SENDER, strSender );
-            params.put( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_RECEIVER, strReceiver );
-
-            // List elements to include to the signature
-            List<String> listElements = new ArrayList<String>(  );
-            listElements.add( strObject );
-            listElements.add( strSender );
-            listElements.add( strReceiver );
-
-            try
-            {
-                HttpAccess httpAccess = new HttpAccess(  );
-                httpAccess.doPost( strUrl, params,
-                    NotifyMyLuteceRequestAuthenticatorService.getRequestAuthenticator(  ), listElements );
-            }
-            catch ( HttpAccessException e )
-            {
-                String strError = "NotifyMyLuteceWebService - Error connecting to '" + strUrl + "' : ";
-                AppLogService.error( strError + e.getMessage(  ), e );
-                throw new AppException( e.getMessage(  ), e );
-            }
+            HttpAccess httpAccess = new HttpAccess(  );
+            httpAccess.doPost( strUrl, params, NotifyMyLuteceRequestAuthenticatorService.getRequestAuthenticator(  ),
+                listElements );
         }
-        else
+        catch ( HttpAccessException e )
         {
-            throw new AppException( 
-                "NotifyMyLuteceWebService - Could not notify the user : the property file 'workflow.property' is not well configured." );
+            String strError = "NotifyMyLuteceWebService - Error connecting to '" + strUrl + "' : ";
+            AppLogService.error( strError + e.getMessage(  ), e );
+            throw new AppException( e.getMessage(  ), e );
         }
     }
 }

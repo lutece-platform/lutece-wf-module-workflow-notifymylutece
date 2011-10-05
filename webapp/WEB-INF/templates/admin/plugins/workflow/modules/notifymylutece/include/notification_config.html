@@ -1,0 +1,121 @@
+<#if config?exists && config.idDirectory!=-1>
+<div class="highlight-box">
+	<br />
+	<p>
+		<label for="sender_name">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name} * :</label>
+		
+		<input type="text" name="sender_name" id="" size="80" value="${sender_name}" maxlength="255"/>		
+		<br/>
+		<label>&nbsp;</label>
+		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name_comment}
+	</p>
+
+  	<p>
+    	<label for="suject">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject} * :</label>
+		<input type="text" name="subject" id="" size="80" value="${subject}" maxlength="255"/>
+		<br/>
+		<label>&nbsp;</label>
+		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject_comment}
+	</p>
+	
+	<p>
+		<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * :</label>
+		<div class="editor">
+			<textarea name="message" id="" rows="20" cols="90" class="richtext">${message}</textarea>
+		</div>
+		<br/>
+		<label>&nbsp;</label>
+		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message_comment}
+	</p>
+	<fieldset>
+		<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_comment}</legend>
+		<table>
+			<tr>
+				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory}</th>
+				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+			</tr>
+			<tr>
+				<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_status}</td>
+				<td>&#36;&#123;status&#125;</td>
+			</tr>
+			<tr>
+				<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_title}</td>
+				<td>&#36;&#123;directory_title&#125;</td>
+			</tr>
+			<tr>
+				<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_description}</td>
+				<td>&#36;&#123;directory_description&#125;</td>
+			</tr>
+		</table>
+	</fieldset>	
+	<br />
+	<#if is_user_attribute_ws_active>
+		<fieldset>
+			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute_comment}</legend>
+			<table>
+				<tr>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute}</th>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_first_name}</td>
+					<td>&#36;&#123;first_name&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_last_name}</td>
+					<td>&#36;&#123;last_name&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_email}</td>
+					<td>&#36;&#123;email&#125;</td>
+				</tr>
+				<tr>
+					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_phone_number}</td>
+					<td>&#36;&#123;phone_number&#125;</td>
+				</tr>
+			</table>
+		</fieldset>
+		<br />
+	</#if>
+	<#if tasks_list?exists && tasks_list?has_content>
+		<fieldset>
+			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_tasks_list_comment}</legend>
+			<table>
+				<tr>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_title}</th>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_type}</th>
+					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+				</tr>
+				<#list tasks_list as task>
+					<tr>
+						<td>${task.getTitle( plugin_workflow, locale )}</td>
+						<td>${task.taskType.title}</td>
+						<td>&#36;&#123;task_${task.id}&#125;</td>
+					</tr>
+				</#list>
+			</table>
+		</fieldset>
+		<br />
+	</#if>
+	<fieldset>
+		<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry_directory_comment}</legend>
+		<table>
+	  		<tr>
+	  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry}</th>
+	  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
+	  		</tr>
+		 	<#list list_entries_freemarker as entry>
+			  	<tr>
+			  		<td>
+			  			${entry.title}
+			  		</td>
+			  		<td>
+			  			&#36;&#123;position_${entry.position}&#125;
+			  		</td>
+			  	</tr>
+			  </#list>
+		</table>
+	</fieldset>
+	<br />
+</div>
+</#if>

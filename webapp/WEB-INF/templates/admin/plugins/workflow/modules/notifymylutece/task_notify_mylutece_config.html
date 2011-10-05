@@ -13,14 +13,61 @@
 	<#assign id_directory = config.idDirectory>
 </#if>
 
+<#function isNotify config id_notification_type>
+	<#if config?? && config.listIdsNotificationType?? && config.listIdsNotificationType?has_content>
+		<#list config.listIdsNotificationType as id>
+			<#if id_notification_type = "" + id>
+				<#return true>
+			</#if>
+		</#list>
+	</#if>
+	<#return false>
+</#function>
+
+<#function isRetrieve config id_retrieval_type>
+	<#if config?? && config.listIdsRetrievalType?? && config.listIdsRetrievalType?has_content>
+		<#list config.listIdsRetrievalType as id>
+			<#if id_retrieval_type = "" + id>
+				<#return true>
+			</#if>
+		</#list>
+	</#if>
+	<#return false>
+</#function>
+
 <h2>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.title}</h2>
 <div class="highlight-box">
+	<#if notification_types?? && notification_types?has_content>
+		<p>
+			<label for="notification_type">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} * :</label>
+			<#list notification_types?keys as id_notification_type>
+				<#assign notification_type = notification_types[id_notification_type]>
+				<input type="checkbox" name="notification_type" value="${id_notification_type}"
+					<#if config?? && isNotify( config, id_notification_type )>
+						checked="checked"
+					</#if>
+				/>&nbsp;${notification_type.getTitle( locale )}
+			</#list>
+		</p>
+	</#if>
+	<#if retrieval_types?? && retrieval_types?has_content>
+		<p>
+			<label for="retrieval_type">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} * :</label>
+			<#list retrieval_types?keys as id_retrieval_type>
+				<#assign retrieval_type = retrieval_types[id_retrieval_type]>
+				<input type="checkbox" name="retrieval_type" value="${id_retrieval_type}"
+					<#if config?? && isRetrieve( config, id_retrieval_type)>
+						checked="checked"
+					</#if>
+				/>&nbsp;${retrieval_type.getTitle( locale )}
+			</#list>
+		</p>
+	</#if>
 	<p>
 		<label for="id_directory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} * :</label>
 		<@combo name="id_directory" items=list_directories default_value=id_directory />
-		<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}"/>
 	</p>
-	<#if list_entries?exists>
+	<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
 		<p id="entry_user_guid">
 			<label for="position_entry_directory_user_guid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
 			<@combo name="position_entry_directory_user_guid" items=list_entries default_value=position_entry_directory_user_guid />&nbsp;
@@ -29,125 +76,34 @@
 			#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid_comment}
 		</p>
 	</#if>
-</div>
-<div class="highlight-box">
 	<p>
-		<label for="sender_name">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name} * :</label>
-		
-		<input type="text" name="sender_name" id="" size="80" value="${sender_name}" maxlength="255"/>		
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name_comment}
+		<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}"/>
 	</p>
-
-  	<p>
-    	<label for="suject">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject} * :</label>
-		<input type="text" name="subject" id="" size="80" value="${subject}" maxlength="255"/>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject_comment}
-	</p>
-	
-	<p>
-		<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * :</label>
-		<div class="editor">
-			<textarea name="message" id="" rows="20" cols="90" class="richtext">${message}</textarea>
-		</div>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message_comment}
-	</p>
-	
-	<#if config?exists && config.idDirectory!=-1>
-		<fieldset>
-			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_comment}</legend>
-			<table>
-				<tr>
-					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory}</th>
-					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_status}</td>
-					<td>&#36;&#123;status&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_title}</td>
-					<td>&#36;&#123;directory_title&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_description}</td>
-					<td>&#36;&#123;directory_description&#125;</td>
-				</tr>
-			</table>
-		</fieldset>	
-		<br />
-		<fieldset>
-			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute_comment}</legend>
-			<table>
-				<tr>
-					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute}</th>
-					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_first_name}</td>
-					<td>&#36;&#123;first_name&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_last_name}</td>
-					<td>&#36;&#123;last_name&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_email}</td>
-					<td>&#36;&#123;email&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_phone_number}</td>
-					<td>&#36;&#123;phone_number&#125;</td>
-				</tr>
-			</table>
-		</fieldset>
-		<br />
-		<#if tasks_list?exists && tasks_list?has_content>
-			<fieldset>
-				<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_tasks_list_comment}</legend>
-				<table>
-					<tr>
-						<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_title}</th>
-						<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_type}</th>
-						<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
-					</tr>
-					<#list tasks_list as task>
-						<tr>
-							<td>${task.getTitle( plugin_workflow, locale )}</td>
-							<td>${task.taskType.title}</td>
-							<td>&#36;&#123;task_${task.id}&#125;</td>
-						</tr>
-					</#list>
-				</table>
-			</fieldset>
-			<br />
-		</#if>
-		<fieldset>
-			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry_directory_comment}</legend>
-			<table>
-		  		<tr>
-		  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry}</th>
-		  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
-		  		</tr>
-			 	<#list list_entries_freemarker as entry>
-				  	<tr>
-				  		<td>
-				  			${entry.title}
-				  		</td>
-				  		<td>
-				  			&#36;&#123;position_${entry.position}&#125;
-				  		</td>
-				  	</tr>
-				  </#list>
-			</table>
-		</fieldset>
-		<br />
+	<#if config?? && isRetrieve( config, "2" )>
+		<table>
+			<tr>
+				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_available_users}</th>
+				<th>&nbsp;</th>
+				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_selected_users}</th>
+			</tr>
+			<tr>
+				<td>
+					<@comboWithParamsAndLength name="select_users" default_value="" additionalParameters="multiple='multiple' size='10' style='width:100%;'" items=available_users_list max_length=175 />
+				</td>
+				<td>
+					<div align="center">
+						<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_select_unselect_users}" />
+					</div>
+				</td>
+				<td>
+					<@comboWithParamsAndLength name="unselect_users" default_value="" additionalParameters="multiple='multiple' size='10' style='width:100%;'" items=selected_users_list max_length=175 />
+				</td>
+			</tr>
+		</table>
 	</#if>
+	<br />
 </div>
+
+<#include "/admin/plugins/workflow/modules/notifymylutece/include/notification_config.html" />
 
 <@initEditor />

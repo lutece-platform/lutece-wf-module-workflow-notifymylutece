@@ -58,6 +58,7 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
@@ -274,6 +275,48 @@ public final class NotifyMyLuteceService
         }
 
         return listTasks;
+    }
+
+    /**
+     * Get the list of available users
+     * @param config the config
+     * @return a {@link ReferenceList}
+     */
+    public ReferenceList getAvailableUsers( TaskNotifyMyLuteceConfig config )
+    {
+        ReferenceList refAvailableUser = new ReferenceList(  );
+
+        for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
+        {
+            if ( ( user != null ) &&
+                    ( ( config == null ) || ( config.getListUserGuid(  ) == null ) ||
+                    !config.getListUserGuid(  ).contains( user.getName(  ) ) ) )
+            {
+                refAvailableUser.addItem( user.getName(  ), user.getName(  ) );
+            }
+        }
+
+        return refAvailableUser;
+    }
+
+    /**
+     * Get the list of selected users
+     * @param config the config
+     * @return a {@link ReferenceList}
+     */
+    public ReferenceList getSelectedUsers( TaskNotifyMyLuteceConfig config )
+    {
+        ReferenceList refSelectedUsers = new ReferenceList(  );
+
+        if ( ( config != null ) && ( config.getListUserGuid(  ) != null ) )
+        {
+            for ( String strUserGuid : config.getListUserGuid(  ) )
+            {
+                refSelectedUsers.addItem( strUserGuid, strUserGuid );
+            }
+        }
+
+        return refSelectedUsers;
     }
 
     // OTHERS

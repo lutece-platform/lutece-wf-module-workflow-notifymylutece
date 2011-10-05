@@ -33,6 +33,14 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business;
 
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.INotificationType;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  *
@@ -44,6 +52,9 @@ public class TaskNotifyMyLuteceConfig
     private int _nIdTask;
     private int _nIdDirectory;
     private int _nPositionEntryDirectoryUserGuid;
+    private List<Integer> _listIdsNotificationType;
+    private List<Integer> _listIdsRetrievalType;
+    private List<String> _listUserGuid;
     private String _strSubject;
     private String _strMessage;
     private String _strSenderName;
@@ -103,9 +114,9 @@ public class TaskNotifyMyLuteceConfig
     }
 
     /**
-     * Get the subject
-     * @return the subject of the message
-     */
+    * Get the subject
+    * @return the subject of the message
+    */
     public String getSubject(  )
     {
         return _strSubject;
@@ -154,5 +165,98 @@ public class TaskNotifyMyLuteceConfig
     public void setSenderName( String senderName )
     {
         _strSenderName = senderName;
+    }
+
+    /**
+     * Set the list of ids notification types
+     * @param listIdsNotificationType the list of ids notification type
+     */
+    public void setListIdsNotificationType( List<Integer> listIdsNotificationType )
+    {
+        _listIdsNotificationType = listIdsNotificationType;
+    }
+
+    /**
+     * Get the list of ids of notification type
+     * @return the list of ids notification type
+     */
+    public List<Integer> getListIdsNotificationType(  )
+    {
+        return _listIdsNotificationType;
+    }
+
+    /**
+     * Get the notification types
+     * @return the notification types
+     */
+    public List<INotificationType> getNotificationTypes(  )
+    {
+        List<INotificationType> listNotificationTypes = new ArrayList<INotificationType>(  );
+
+        if ( ( _listIdsNotificationType != null ) && !_listIdsNotificationType.isEmpty(  ) )
+        {
+            for ( int nIdNotificationType : _listIdsNotificationType )
+            {
+                listNotificationTypes.add( NotificationTypeFactory.getFactory(  )
+                                                                  .getNotificationType( nIdNotificationType ) );
+            }
+        }
+
+        return listNotificationTypes;
+    }
+
+    /**
+     * Set the list of ids retrieval type
+     * @param listIdsRetrievalType the ids retrieval type
+     */
+    public void setListIdsRetrievalType( List<Integer> listIdsRetrievalType )
+    {
+        _listIdsRetrievalType = listIdsRetrievalType;
+    }
+
+    /**
+     * Get the list of ids retrieval type
+     * @return the list of ids retrieval type
+     */
+    public List<Integer> getListIdsRetrievalType(  )
+    {
+        return _listIdsRetrievalType;
+    }
+
+    /**
+     * Get the retrieval types
+     * @return the retrieval types
+     */
+    public List<IRetrievalType> getRetrievalTypes(  )
+    {
+        List<IRetrievalType> listRetrievalTypes = new ArrayList<IRetrievalType>(  );
+
+        if ( ( _listIdsRetrievalType != null ) && !_listIdsRetrievalType.isEmpty(  ) )
+        {
+            for ( int nIdRetrievalType : _listIdsRetrievalType )
+            {
+                listRetrievalTypes.add( RetrievalTypeFactory.getFactory(  ).getRetrievalType( nIdRetrievalType ) );
+            }
+        }
+
+        return listRetrievalTypes;
+    }
+
+    /**
+     * Set the list of user guid
+     * @param listUserGuid the list of user guid
+     */
+    public void setListUserGuid( List<String> listUserGuid )
+    {
+        _listUserGuid = listUserGuid;
+    }
+
+    /**
+     * Get the list of user guid
+     * @return the list of user guid
+     */
+    public List<String> getListUserGuid(  )
+    {
+        return _listUserGuid;
     }
 }
