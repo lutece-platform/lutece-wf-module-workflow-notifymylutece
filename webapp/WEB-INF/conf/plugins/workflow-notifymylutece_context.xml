@@ -47,11 +47,16 @@
 		<property name="idType" value="2" />
 		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.users_list" />
 	</bean>
+	<bean id="workflow-notifymylutece.retrievalTypeAllUsers" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeAllUsers">
+		<property name="idType" value="3" />
+		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.all_users" />
+	</bean>
 	<bean id="workflow-notifymylutece.retrievalTypeFactory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory">
 		<property name="retrievalTypes">
 			<map>
 				<entry key="1" value-ref="workflow-notifymylutece.retrievalTypeDirectory" />
 				<entry key="2" value-ref="workflow-notifymylutece.retrievalTypeUsersList" />
+				<entry key="3" value-ref="workflow-notifymylutece.retrievalTypeAllUsers" />
 			</map>
 		</property>
 	</bean>
