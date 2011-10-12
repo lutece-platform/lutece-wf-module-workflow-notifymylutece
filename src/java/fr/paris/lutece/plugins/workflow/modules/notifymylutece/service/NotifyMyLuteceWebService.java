@@ -95,9 +95,6 @@ public final class NotifyMyLuteceWebService
 
         // List elements to include to the signature
         List<String> listElements = new ArrayList<String>(  );
-        listElements.add( strObject );
-        listElements.add( strSender );
-        listElements.add( strReceiver );
 
         try
         {

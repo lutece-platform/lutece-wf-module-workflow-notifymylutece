@@ -67,9 +67,6 @@
         <property name="hashService" ref="workflow-notifymylutece.hashService" />
         <property name="signatureElements" > 
             <list>
-                <value>notification_object</value>
-                <value>notification_sender</value>
-                <value>notification_receiver</value>
             </list>
         </property>
         <property name="privateKey">
