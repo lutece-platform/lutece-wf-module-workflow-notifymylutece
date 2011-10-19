@@ -286,13 +286,16 @@ public final class NotifyMyLuteceService
     {
         ReferenceList refAvailableUser = new ReferenceList(  );
 
-        for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
+        if ( SecurityService.isAuthenticationEnable(  ) )
         {
-            if ( ( user != null ) &&
-                    ( ( config == null ) || ( config.getListUserGuid(  ) == null ) ||
-                    !config.getListUserGuid(  ).contains( user.getName(  ) ) ) )
+            for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
             {
-                refAvailableUser.addItem( user.getName(  ), user.getName(  ) );
+                if ( ( user != null ) &&
+                        ( ( config == null ) || ( config.getListUserGuid(  ) == null ) ||
+                        !config.getListUserGuid(  ).contains( user.getName(  ) ) ) )
+                {
+                    refAvailableUser.addItem( user.getName(  ), user.getName(  ) );
+                }
             }
         }
 
