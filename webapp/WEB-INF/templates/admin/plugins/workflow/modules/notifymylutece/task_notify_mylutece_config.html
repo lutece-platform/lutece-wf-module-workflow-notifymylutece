@@ -40,13 +40,23 @@
 	<#if notification_types?? && notification_types?has_content>
 		<p>
 			<label for="notification_type">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} * :</label>
+			<#assign is_first = true>
 			<#list notification_types?keys as id_notification_type>
+				<#if !is_first>
+					<label>&nbsp;</label>
+				<#else>
+					<#assign is_first = false>
+				</#if>
 				<#assign notification_type = notification_types[id_notification_type]>
 				<input type="checkbox" name="notification_type" value="${id_notification_type}"
 					<#if config?? && isNotify( config, id_notification_type )>
 						checked="checked"
 					</#if>
 				/>&nbsp;${notification_type.getTitle( locale )}
+				<#if notification_type.getComment( locale )?? && notification_type.getComment( locale ) != ''>
+					(${notification_type.getComment( locale )})
+				</#if>
+				<br />
 			</#list>
 		</p>
 	</#if>

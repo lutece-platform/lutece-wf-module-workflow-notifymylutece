@@ -24,10 +24,12 @@
 	<bean id="workflow-notifymylutece.notificationTypeEmail" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeEmail">
 		<property name="idType" value="1" />
 		<property name="titleKey" value="module.workflow.notifymylutece.notification_type.email" />
+		<property name="commentKey" value="module.workflow.notifymylutece.notification_type.email.comment" />
 	</bean>
 	<bean id="workflow-notifymylutece.notificationTypeWS" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeWS">
 		<property name="idType" value="2" />
 		<property name="titleKey" value="module.workflow.notifymylutece.notification_type.ws" />
+		<property name="commentKey" value="module.workflow.notifymylutece.notification_type.ws.comment" />
 	</bean>
 	<bean id="workflow-notifymylutece.notificationTypeFactory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory">
 		<property name="notificationTypes">

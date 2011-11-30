@@ -49,6 +49,7 @@ public abstract class AbstractNotificationType implements INotificationType
 {
     private int _nIdType;
     private String _strTitleKey;
+    private String _strCommentKey;
 
     /**
      * {@inheritDoc}
@@ -90,6 +91,35 @@ public abstract class AbstractNotificationType implements INotificationType
         if ( StringUtils.isNotBlank( _strTitleKey ) && ( locale != null ) )
         {
             return I18nService.getLocalizedString( _strTitleKey, locale );
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCommentKey( String strCommentKey )
+    {
+        _strCommentKey = strCommentKey;
+    }
+
+    /**
+    * {@inheritDoc}
+    */
+    public String getCommentKey(  )
+    {
+        return _strCommentKey;
+    }
+
+    /**
+    * {@inheritDoc}
+    */
+    public String getComment( Locale locale )
+    {
+        if ( StringUtils.isNotBlank( _strCommentKey ) && ( locale != null ) )
+        {
+            return I18nService.getLocalizedString( _strCommentKey, locale );
         }
 
         return StringUtils.EMPTY;

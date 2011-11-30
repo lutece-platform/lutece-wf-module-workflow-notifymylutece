@@ -75,6 +75,18 @@ public interface INotificationType
     String getTitle( Locale locale );
 
     /**
+     * Set the comment key
+     * @param strCommentKey the comment key
+     */
+    void setCommentKey( String strCommentKey );
+
+    /**
+     * Get the comment key
+     * @return the comment key
+     */
+    String getCommentKey(  );
+
+    /**
      * Notify
      * @param strObject the object
      * @param strMessage the message
