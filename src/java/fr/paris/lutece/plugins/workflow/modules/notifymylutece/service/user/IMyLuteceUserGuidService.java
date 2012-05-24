@@ -31,50 +31,39 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
  *
- * RetrievalTypeUsersList
+ * IMyLuteceUserGuidService
  *
  */
-public class RetrievalTypeAllUsers extends AbstractRetrievalType
+public interface IMyLuteceUserGuidService
 {
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
-    {
-        List<String> listUserGuid = new ArrayList<String>(  );
-
-        for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
-        {
-            if ( user != null )
-            {
-                listUserGuid.add( user.getName(  ) );
-            }
-        }
-
-        return listUserGuid;
-    }
+    * Find the list of User guid associated to the task
+    * @param nIdTask the id task
+    * @return the list of User Guid
+    */
+    List<String> find( int nIdTask );
 
     /**
-     * {@inheritDoc}
+     * Create an association user guid - task
+     * @param nIdTask the id task
+     * @param strUserGuid the user guid
      */
-    @Override
-    public String checkConfigData( HttpServletRequest request )
-    {
-        return null;
-    }
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void create( int nIdTask, String strUserGuid );
+
+    /**
+     * Remove the associations user guid - task
+     * @param nIdTask the id task
+     */
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void remove( int nIdTask );
 }

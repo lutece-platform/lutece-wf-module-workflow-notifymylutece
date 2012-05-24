@@ -60,6 +60,7 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void insert( TaskNotifyMyLuteceConfig config, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -80,6 +81,7 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void store( TaskNotifyMyLuteceConfig config, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
@@ -100,6 +102,7 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public TaskNotifyMyLuteceConfig load( int nIdTask, Plugin plugin )
     {
         TaskNotifyMyLuteceConfig config = null;
@@ -130,6 +133,7 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void delete( int nIdTask, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
@@ -142,6 +146,7 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<TaskNotifyMyLuteceConfig> loadAll( Plugin plugin )
     {
         List<TaskNotifyMyLuteceConfig> configList = new ArrayList<TaskNotifyMyLuteceConfig>(  );

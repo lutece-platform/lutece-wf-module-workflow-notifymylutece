@@ -31,26 +31,20 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.web;
 
-import fr.paris.lutece.plugins.directory.business.Directory;
-import fr.paris.lutece.plugins.directory.business.DirectoryHome;
-import fr.paris.lutece.plugins.directory.business.Record;
-import fr.paris.lutece.plugins.directory.business.RecordHome;
-import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistoryHome;
-import fr.paris.lutece.plugins.workflow.business.task.Task;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.INotificationType;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceService;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalTypeFactory;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.INotifyMyLuteceService;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.ITaskNotifyMyLuteceConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
+import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributesManager;
+import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -59,7 +53,6 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 import org.apache.commons.lang.StringUtils;
@@ -71,67 +64,54 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
 import javax.servlet.http.HttpServletRequest;
 
 
 /**
  *
- * TaskNotifyMyLutece
+ * NotifyMyLuteceTaskComponent
  *
  */
-public class TaskNotifyMyLutece extends Task
+public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
 {
-    // TEMPLATES
+    // TEMPLATE
     private static final String TEMPLATE_TASK_NOTIFY_MYLUTECE_CONFIG = "admin/plugins/workflow/modules/notifymylutece/task_notify_mylutece_config.html";
-    private static final String TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION = "admin/plugins/workflow/modules/notifymylutece/task_notify_mylutece_notification.html";
+
+    // SERVICES
+    @Inject
+    private ITaskNotifyMyLuteceConfigService _taskNotifyMyLuteceConfigService;
+    @Inject
+    private IWorkflowUserAttributesManager _userAttributesManager;
+    @Inject
+    private INotifyMyLuteceService _notifyMyLuteceService;
+    @Inject
+    private IRetrievalTypeFactory _retrievalTypeFactory;
 
     /**
      * {@inheritDoc}
      */
-    public void init(  )
+    @Override
+    public String doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
     {
-    }
+        String strError = checkConfigData( request, locale );
 
-    /**
-     * {@inheritDoc}
-     */
-    public void processTask( int nIdResourceHistory, HttpServletRequest request, Plugin plugin, Locale locale )
-    {
-        ResourceHistory resourceHistory = ResourceHistoryHome.findByPrimaryKey( nIdResourceHistory, plugin );
-        TaskNotifyMyLuteceConfig config = TaskNotifyMyLuteceConfigService.getService(  ).findByPrimaryKey( getId(  ) );
-
-        if ( ( config != null ) && ( resourceHistory != null ) &&
-                Record.WORKFLOW_RESOURCE_TYPE.equals( resourceHistory.getResourceType(  ) ) )
+        if ( StringUtils.isBlank( strError ) )
         {
-            Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-
-            // Record
-            Record record = RecordHome.findByPrimaryKey( resourceHistory.getIdResource(  ), pluginDirectory );
-
-            if ( record != null )
-            {
-                Directory directory = DirectoryHome.findByPrimaryKey( record.getDirectory(  ).getIdDirectory(  ),
-                        pluginDirectory );
-
-                if ( directory != null )
-                {
-                    record.setDirectory( directory );
-                    sendMessage( request, nIdResourceHistory, locale, record, directory, config );
-                }
-            }
+            setConfigData( request, task );
         }
-    }
 
-    // GET
+        return strError;
+    }
 
     /**
      * {@inheritDoc}
      */
-    public String getDisplayConfigForm( HttpServletRequest request, Plugin plugin, Locale locale )
+    @Override
+    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
-        NotifyMyLuteceService notifyMyLuteceService = NotifyMyLuteceService.getService(  );
-        TaskNotifyMyLuteceConfigService configService = TaskNotifyMyLuteceConfigService.getService(  );
-        TaskNotifyMyLuteceConfig config = configService.findByPrimaryKey( getId(  ) );
+        TaskNotifyMyLuteceConfig config = _taskNotifyMyLuteceConfigService.findByPrimaryKey( task.getId(  ) );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyMyLuteceConstants.PROPERTY_DEFAULT_SENDER_NAME );
         Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
@@ -140,23 +120,22 @@ public class TaskNotifyMyLutece extends Task
 
         model.put( NotifyMyLuteceConstants.MARK_CONFIG, config );
         model.put( NotifyMyLuteceConstants.MARK_DEFAULT_SENDER_NAME, strDefaultSenderName );
-        model.put( NotifyMyLuteceConstants.MARK_LIST_ENTRIES, notifyMyLuteceService.getListEntries( getId(  ), locale ) );
-        model.put( NotifyMyLuteceConstants.MARK_LIST_DIRECTORIES, notifyMyLuteceService.getListDirectories(  ) );
+        model.put( NotifyMyLuteceConstants.MARK_LIST_ENTRIES,
+            _notifyMyLuteceService.getListEntries( task.getId(  ), locale ) );
+        model.put( NotifyMyLuteceConstants.MARK_LIST_DIRECTORIES, _notifyMyLuteceService.getListDirectories(  ) );
         model.put( NotifyMyLuteceConstants.MARK_LIST_ENTRIES_FREEMARKER,
-            notifyMyLuteceService.getListEntries( getId(  ) ) );
+            _notifyMyLuteceService.getListEntries( task.getId(  ) ) );
         model.put( NotifyMyLuteceConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( NotifyMyLuteceConstants.MARK_LOCALE, locale );
         model.put( NotifyMyLuteceConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
         model.put( NotifyMyLuteceConstants.MARK_TASKS_LIST,
-            notifyMyLuteceService.getListTasks( getAction(  ).getId(  ), locale ) );
-        model.put( NotifyMyLuteceConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE,
-            WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) );
+            _notifyMyLuteceService.getListTasks( task.getAction(  ).getId(  ), locale ) );
+        model.put( NotifyMyLuteceConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE, _userAttributesManager.isEnabled(  ) );
         model.put( NotifyMyLuteceConstants.MARK_NOTIFICATION_TYPES,
             NotificationTypeFactory.getFactory(  ).getNotificationTypes(  ) );
-        model.put( NotifyMyLuteceConstants.MARK_RETRIEVAL_TYPES,
-            RetrievalTypeFactory.getFactory(  ).getRetrievalTypes(  ) );
-        model.put( NotifyMyLuteceConstants.MARK_AVAILABLE_USERS_LIST, notifyMyLuteceService.getAvailableUsers( config ) );
-        model.put( NotifyMyLuteceConstants.MARK_SELECTED_USERS_LIST, notifyMyLuteceService.getSelectedUsers( config ) );
+        model.put( NotifyMyLuteceConstants.MARK_RETRIEVAL_TYPES, _retrievalTypeFactory.getRetrievalTypes(  ) );
+        model.put( NotifyMyLuteceConstants.MARK_AVAILABLE_USERS_LIST, _notifyMyLuteceService.getAvailableUsers( config ) );
+        model.put( NotifyMyLuteceConstants.MARK_SELECTED_USERS_LIST, _notifyMyLuteceService.getSelectedUsers( config ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_MYLUTECE_CONFIG, locale, model );
 
@@ -166,8 +145,8 @@ public class TaskNotifyMyLutece extends Task
     /**
      * {@inheritDoc}
      */
-    public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request,
-        Plugin plugin, Locale locale )
+    @Override
+    public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
         return null;
     }
@@ -175,108 +154,10 @@ public class TaskNotifyMyLutece extends Task
     /**
      * {@inheritDoc}
      */
-    public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Plugin plugin, Locale locale )
+    @Override
+    public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ReferenceList getTaskFormEntries( Plugin plugin, Locale locale )
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Plugin plugin, Locale locale )
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getTitle( Plugin plugin, Locale locale )
-    {
-        String strTitle = StringUtils.EMPTY;
-        TaskNotifyMyLuteceConfig config = TaskNotifyMyLuteceConfigService.getService(  ).findByPrimaryKey( getId(  ) );
-
-        if ( config != null )
-        {
-            strTitle = config.getSubject(  );
-        }
-
-        return StringUtils.isNotBlank( strTitle ) ? strTitle : StringUtils.EMPTY;
-    }
-
-    // DO
-
-    /**
-     * {@inheritDoc}
-     */
-    public void doRemoveConfig( Plugin plugin )
-    {
-        TaskNotifyMyLuteceConfigService.getService(  ).remove( getId(  ) );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void doRemoveTaskInformation( int nIdHistory, Plugin plugin )
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String doSaveConfig( HttpServletRequest request, Locale locale, Plugin plugin )
-    {
-        String strError = checkConfigData( request, locale );
-
-        if ( StringUtils.isBlank( strError ) )
-        {
-            setConfigData( request );
-        }
-
-        return strError;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String doValidateTask( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale,
-        Plugin plugin )
-    {
-        return null;
-    }
-
-    // CHECK
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isConfigRequire(  )
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isFormTaskRequire(  )
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isTaskForActionAutomatic(  )
-    {
-        return true;
     }
 
     // PRIVATE METHODS
@@ -340,9 +221,8 @@ public class TaskNotifyMyLutece extends Task
 
             if ( StringUtils.isBlank( strRequiredField ) )
             {
-                for ( Entry<String, IRetrievalType> entryRetrievalType : RetrievalTypeFactory.getFactory(  )
-                                                                                             .getRetrievalTypes(  )
-                                                                                             .entrySet(  ) )
+                for ( Entry<String, IRetrievalType> entryRetrievalType : _retrievalTypeFactory.getRetrievalTypes(  )
+                                                                                              .entrySet(  ) )
                 {
                     strRequiredField = entryRetrievalType.getValue(  ).checkConfigData( request );
 
@@ -367,11 +247,10 @@ public class TaskNotifyMyLutece extends Task
     /**
      * Set the config data
      * @param request the HTTP request
+     * @param task the task
      */
-    private void setConfigData( HttpServletRequest request )
+    private void setConfigData( HttpServletRequest request, ITask task )
     {
-        TaskNotifyMyLuteceConfigService configService = TaskNotifyMyLuteceConfigService.getService(  );
-
         // Fetch parameters
         String strIdDirectory = request.getParameter( NotifyMyLuteceConstants.PARAMETER_ID_DIRECTORY );
         String strPositionEntryDirectoryUserGuid = request.getParameter( NotifyMyLuteceConstants.PARAMETER_POSITION_ENTRY_DIRECTORY_USER_GUID );
@@ -425,12 +304,12 @@ public class TaskNotifyMyLutece extends Task
 
         // In case there are no errors, then the config is created/updated
         boolean bCreate = false;
-        TaskNotifyMyLuteceConfig config = configService.findByPrimaryKey( getId(  ) );
+        TaskNotifyMyLuteceConfig config = _taskNotifyMyLuteceConfigService.findByPrimaryKey( task.getId(  ) );
 
         if ( config == null )
         {
             config = new TaskNotifyMyLuteceConfig(  );
-            config.setIdTask( getId(  ) );
+            config.setIdTask( task.getId(  ) );
             bCreate = true;
         }
 
@@ -445,11 +324,11 @@ public class TaskNotifyMyLutece extends Task
 
         if ( bCreate )
         {
-            configService.create( config );
+            _taskNotifyMyLuteceConfigService.create( config );
         }
         else
         {
-            configService.update( config );
+            _taskNotifyMyLuteceConfigService.update( config );
         }
     }
 
@@ -495,42 +374,5 @@ public class TaskNotifyMyLutece extends Task
         }
 
         return listUserGuid;
-    }
-
-    /**
-     * Send the message
-     * @param request the HTTP request
-     * @param nIdResourceHistory the id resource history
-     * @param locale the locale
-     * @param record the record
-     * @param directory the directory
-     * @param config the config
-     */
-    private void sendMessage( HttpServletRequest request, int nIdResourceHistory, Locale locale, Record record,
-        Directory directory, TaskNotifyMyLuteceConfig config )
-    {
-        NotifyMyLuteceService notifyMyLuteceService = NotifyMyLuteceService.getService(  );
-
-        for ( IRetrievalType retrievalType : config.getRetrievalTypes(  ) )
-        {
-            for ( String strReceiver : retrievalType.getReceiver( config, record.getIdRecord(  ),
-                    directory.getIdDirectory(  ) ) )
-            {
-                Map<String, Object> model = notifyMyLuteceService.fillModel( config, record, directory, strReceiver,
-                        request, getAction(  ).getId(  ), nIdResourceHistory );
-                HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                            TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
-
-                String strObject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model )
-                                                     .getHtml(  );
-                String strMessage = template.getHtml(  );
-                String strSender = config.getSenderName(  );
-
-                for ( INotificationType notificationType : config.getNotificationTypes(  ) )
-                {
-                    notificationType.notify( strObject, strMessage, strSender, strReceiver );
-                }
-            }
-        }
     }
 }

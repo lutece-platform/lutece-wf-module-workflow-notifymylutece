@@ -45,24 +45,26 @@ import fr.paris.lutece.plugins.directory.business.RecordFieldFilter;
 import fr.paris.lutece.plugins.directory.business.RecordFieldHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
-import fr.paris.lutece.plugins.workflow.business.task.ITask;
-import fr.paris.lutece.plugins.workflow.business.task.TaskHome;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.INotificationType;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
-import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
+import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
-import fr.paris.lutece.portal.business.workflow.State;
+import fr.paris.lutece.plugins.workflowcore.business.state.State;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.util.ReferenceList;
+import fr.paris.lutece.util.html.HtmlTemplate;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -72,6 +74,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -80,11 +84,20 @@ import javax.servlet.http.HttpServletRequest;
  * NotifyMyLuteceService
  *
  */
-public final class NotifyMyLuteceService
+public final class NotifyMyLuteceService implements INotifyMyLuteceService
 {
-    private static final String BEAN_NOTIFY_MYLUTECE_SERVICE = "workflow-notifymylutece.notifyMyLuteceService";
+    public static final String BEAN_SERVICE = "workflow-notifymylutece.notifyMyLuteceService";
+    private static final String TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION = "admin/plugins/workflow/modules/notifymylutece/task_notify_mylutece_notification.html";
     private List<Integer> _listRefusedEntryTypes;
     private List<Integer> _listAcceptedEntryTypes;
+
+    // SERVICES
+    @Inject
+    private ITaskNotifyMyLuteceConfigService _taskNotifyMyLuteceConfigService;
+    @Inject
+    private ITaskService _taskService;
+    @Inject
+    private IWorkflowUserAttributesManager _userAttributesManager;
 
     /**
      * Private constructor
@@ -98,23 +111,12 @@ public final class NotifyMyLuteceService
         _listRefusedEntryTypes = fillListEntryTypes( NotifyMyLuteceConstants.PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE );
     }
 
-    /**
-     * Get the instance of the service
-     * @return the instance of the service
-     */
-    public static NotifyMyLuteceService getService(  )
-    {
-        return (NotifyMyLuteceService) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
-            BEAN_NOTIFY_MYLUTECE_SERVICE );
-    }
-
     // CHECKS
 
     /**
-     * Check if the given entry type id is refused
-     * @param nIdEntryType the id entry type
-     * @return true if it is refused, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean isEntryTypeRefused( int nIdEntryType )
     {
         boolean bIsRefused = true;
@@ -128,10 +130,9 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Check if the given entry type id is accepted
-     * @param nIdEntryType the id entry type
-     * @return true if it is accepted, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean isEntryTypeAccepted( int nIdEntryType )
     {
         boolean bIsAccepted = false;
@@ -147,9 +148,9 @@ public final class NotifyMyLuteceService
     // GETS
 
     /**
-     * Get the list of directorise
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getListDirectories(  )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
@@ -166,14 +167,12 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Get the list of entries that have the accepted type (which are defined in <b>workflow-notifymylutece.properties</b>)
-     * @param nIdTask the id task
-     * @param locale the Locale
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getListEntries( int nIdTask, Locale locale )
     {
-        TaskNotifyMyLuteceConfig config = TaskNotifyMyLuteceConfigService.getService(  ).findByPrimaryKey( nIdTask );
+        TaskNotifyMyLuteceConfig config = _taskNotifyMyLuteceConfigService.findByPrimaryKey( nIdTask );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         ReferenceList refenreceListEntries = new ReferenceList(  );
         refenreceListEntries.addItem( DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.EMPTY_STRING );
@@ -200,15 +199,14 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Get the list of entries that have not the refused type (which are defined in the <b>workflow-notifymylutece.properties</b>)
-     * @param nIdTask the id task
-     * @return a list of IEntry
+     * {@inheritDoc}
      */
+    @Override
     public List<IEntry> getListEntries( int nIdTask )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
-        TaskNotifyMyLuteceConfig config = TaskNotifyMyLuteceConfigService.getService(  ).findByPrimaryKey( nIdTask );
+        TaskNotifyMyLuteceConfig config = _taskNotifyMyLuteceConfigService.findByPrimaryKey( nIdTask );
 
         List<IEntry> listEntries = new ArrayList<IEntry>(  );
 
@@ -232,12 +230,9 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Get the receiver
-     * @param config the config
-     * @param nIdRecord the id record
-     * @param nIdDirectory the id directory
-     * @return the receiver
+     * {@inheritDoc}
      */
+    @Override
     public String getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
     {
         String strReceiver = StringUtils.EMPTY;
@@ -251,19 +246,16 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Get the list of tasks
-     * @param nIdAction the id action
-     * @param locale the locale
-     * @return a list of {@link ITask}
+     * {@inheritDoc}
      */
+    @Override
     public List<ITask> getListTasks( int nIdAction, Locale locale )
     {
         List<ITask> listTasks = new ArrayList<ITask>(  );
-        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
-        for ( ITask task : TaskHome.getListTaskByIdAction( nIdAction, pluginWorkflow, locale ) )
+        for ( ITask task : _taskService.getListTaskByIdAction( nIdAction, locale ) )
         {
-            for ( ITaskInfoProvider provider : TaskInfoManager.getManager(  ).getProvidersList(  ) )
+            for ( ITaskInfoProvider provider : TaskInfoManager.getProvidersList(  ) )
             {
                 if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
                 {
@@ -278,10 +270,9 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Get the list of available users
-     * @param config the config
-     * @return a {@link ReferenceList}
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getAvailableUsers( TaskNotifyMyLuteceConfig config )
     {
         ReferenceList refAvailableUser = new ReferenceList(  );
@@ -303,10 +294,9 @@ public final class NotifyMyLuteceService
     }
 
     /**
-     * Get the list of selected users
-     * @param config the config
-     * @return a {@link ReferenceList}
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getSelectedUsers( TaskNotifyMyLuteceConfig config )
     {
         ReferenceList refSelectedUsers = new ReferenceList(  );
@@ -325,16 +315,9 @@ public final class NotifyMyLuteceService
     // OTHERS
 
     /**
-     * Fill the model for the notification message
-     * @param config the config
-     * @param record the record
-     * @param directory the directory
-     * @param strReceiver the user guid of the receiver
-     * @param request the HTTP requset
-     * @param nIdAction the id action
-     * @param nIdHistory the id history
-     * @return the model
+     * {@inheritDoc}
      */
+    @Override
     public Map<String, Object> fillModel( TaskNotifyMyLuteceConfig config, Record record, Directory directory,
         String strReceiver, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
@@ -405,7 +388,7 @@ public final class NotifyMyLuteceService
         {
             State state = WorkflowService.getInstance(  )
                                          .getState( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
-                    directory.getIdWorkflow(  ), null, null );
+                    directory.getIdWorkflow(  ), null );
             model.put( NotifyMyLuteceConstants.MARK_STATUS, state.getName(  ) );
         }
 
@@ -416,10 +399,40 @@ public final class NotifyMyLuteceService
         for ( ITask task : getListTasks( nIdAction, locale ) )
         {
             model.put( NotifyMyLuteceConstants.MARK_TASK + task.getId(  ),
-                TaskInfoManager.getManager(  ).getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
+                TaskInfoManager.getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
         }
 
         return model;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendMessage( HttpServletRequest request, int nIdResourceHistory, Locale locale, Record record,
+        Directory directory, TaskNotifyMyLuteceConfig config, ITask task )
+    {
+        for ( IRetrievalType retrievalType : config.getRetrievalTypes(  ) )
+        {
+            for ( String strReceiver : retrievalType.getReceiver( config, record.getIdRecord(  ),
+                    directory.getIdDirectory(  ) ) )
+            {
+                Map<String, Object> model = this.fillModel( config, record, directory, strReceiver, request,
+                        task.getAction(  ).getId(  ), nIdResourceHistory );
+                HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+                            TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
+
+                String strObject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model )
+                                                     .getHtml(  );
+                String strMessage = template.getHtml(  );
+                String strSender = config.getSenderName(  );
+
+                for ( INotificationType notificationType : config.getNotificationTypes(  ) )
+                {
+                    notificationType.notify( strObject, strMessage, strSender, strReceiver );
+                }
+            }
+        }
     }
 
     // PRIVATE METHODS
@@ -497,10 +510,9 @@ public final class NotifyMyLuteceService
      */
     private void fillModelWithUserAttributes( Map<String, Object> model, String strUserGuid )
     {
-        if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) && StringUtils.isNotBlank( strUserGuid ) )
+        if ( _userAttributesManager.isEnabled(  ) && StringUtils.isNotBlank( strUserGuid ) )
         {
-            Map<String, String> mapUserAttributes = WorkflowUserAttributesManager.getManager(  )
-                                                                                 .getAttributes( strUserGuid );
+            Map<String, String> mapUserAttributes = _userAttributesManager.getAttributes( strUserGuid );
             String strFirstName = mapUserAttributes.get( LuteceUser.NAME_GIVEN );
             String strLastName = mapUserAttributes.get( LuteceUser.NAME_FAMILY );
             String strEmail = mapUserAttributes.get( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );

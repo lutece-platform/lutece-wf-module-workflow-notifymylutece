@@ -31,50 +31,39 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.notification;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
  *
- * RetrievalTypeUsersList
+ * INotificationTypeService
  *
  */
-public class RetrievalTypeAllUsers extends AbstractRetrievalType
+public interface INotificationTypeService
 {
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
-    {
-        List<String> listUserGuid = new ArrayList<String>(  );
-
-        for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
-        {
-            if ( user != null )
-            {
-                listUserGuid.add( user.getName(  ) );
-            }
-        }
-
-        return listUserGuid;
-    }
+    * Find the list of id notification type for a task
+    * @param nIdTask the id task
+    * @return the list of id notification type
+    */
+    List<Integer> find( int nIdTask );
 
     /**
-     * {@inheritDoc}
+     * Create an association notification type - task
+     * @param nIdTask the id task
+     * @param nIdNotificationType the id notification type
      */
-    @Override
-    public String checkConfigData( HttpServletRequest request )
-    {
-        return null;
-    }
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void create( int nIdTask, int nIdNotificationType );
+
+    /**
+     * Remove the associations notification type - task
+     * @param nIdTask the id task
+     */
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void remove( int nIdTask );
 }

@@ -31,50 +31,57 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.notification;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.INotificationTypeDAO;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.inject.Inject;
 
 
 /**
  *
- * RetrievalTypeUsersList
+ * NotificationTypeService
  *
  */
-public class RetrievalTypeAllUsers extends AbstractRetrievalType
+public class NotificationTypeService implements INotificationTypeService
 {
+    public static final String BEAN_SERVICE = "workflow-notifymylutece.notificationTypeService";
+    @Inject
+    private INotificationTypeDAO _notificationTypeDAO;
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
+    public List<Integer> find( int nIdTask )
     {
-        List<String> listUserGuid = new ArrayList<String>(  );
-
-        for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
-        {
-            if ( user != null )
-            {
-                listUserGuid.add( user.getName(  ) );
-            }
-        }
-
-        return listUserGuid;
+        return _notificationTypeDAO.load( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String checkConfigData( HttpServletRequest request )
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    public void create( int nIdTask, int nIdNotificationType )
     {
-        return null;
+        _notificationTypeDAO.insert( nIdTask, nIdNotificationType,
+            PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    public void remove( int nIdTask )
+    {
+        _notificationTypeDAO.delete( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
     }
 }

@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-<beans>
+	<!-- Transaction Manager -->
+	<bean id="workflow-notifymylutece.transactionManager" class="fr.paris.lutece.portal.service.database.DAOUtilTransactionManager"
+		p:pluginName="workflow-notifymylutece" />
+	
 	<!-- DAO -->
 	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfigDAO"/>
 	<bean id="workflow-notifymylutece.notificationTypeDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeDAO"/>
@@ -12,25 +24,30 @@
 	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService"/>
 	<bean id="workflow-notifymylutece.notifyMyLuteceService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceService"/>
 	<bean id="workflow-notifymylutece.notifyMyLuteceWebService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceWebService"/>
+	<bean id="workflow-notifymylutece.notificationTypeService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.notification.NotificationTypeService" />
+	<bean id="workflow-notifymylutece.retrievalTypeService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.retrieval.RetrievalTypeService" />
+	<bean id="workflow-notifymylutece.myLuteceUserGuidService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user.MyLuteceUserGuidService" />
 
-	<!-- Tasks -->
-	<bean id="workflow-notifymylutece.taskNotifyMyLutece" class="fr.paris.lutece.plugins.workflow.business.task.TaskType" >
-		<property name="key" value="taskNotifyMyLutece" />
-		<property name="titleI18nKey" value="module.workflow.notifymylutece.task_notify_mylutece_title" />
-		<property name="className" value="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLutece"/>
-	</bean>
+	<!-- Task -->
+	<bean id="workflow-notifymylutece.taskTypeNotifyMyLutece" class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+		p:key="taskNotifyMyLutece"
+		p:titleI18nKey="module.workflow.notifymylutece.task_notify_mylutece_title"
+		p:beanName="workflow-notifymylutece.taskNotifyMyLutece"
+		p:configRequired="true"
+		p:taskForAutomaticAction="true" />
+	<bean id="workflow-notifymylutece.taskNotifyMyLutece" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLutece" scope="prototype" />
+	<bean id="workflow-notifymylutece.notifyMyLuteceTaskComponent" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.web.NotifyMyLuteceTaskComponent"
+		p:taskType-ref="workflow-notifymylutece.taskTypeNotifyMyLutece" />
 	
 	<!-- Notification type -->
-	<bean id="workflow-notifymylutece.notificationTypeEmail" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeEmail">
-		<property name="idType" value="1" />
-		<property name="titleKey" value="module.workflow.notifymylutece.notification_type.email" />
-		<property name="commentKey" value="module.workflow.notifymylutece.notification_type.email.comment" />
-	</bean>
-	<bean id="workflow-notifymylutece.notificationTypeWS" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeWS">
-		<property name="idType" value="2" />
-		<property name="titleKey" value="module.workflow.notifymylutece.notification_type.ws" />
-		<property name="commentKey" value="module.workflow.notifymylutece.notification_type.ws.comment" />
-	</bean>
+	<bean id="workflow-notifymylutece.notificationTypeEmail" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeEmail"
+		p:idType="1"
+		p:titleKey="module.workflow.notifymylutece.notification_type.email"
+		p:commentKey="module.workflow.notifymylutece.notification_type.email.comment" />
+	<bean id="workflow-notifymylutece.notificationTypeWS" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeWS"
+		p:idType="2"
+		p:titleKey="module.workflow.notifymylutece.notification_type.ws"
+		p:commentKey="module.workflow.notifymylutece.notification_type.ws.comment" />
 	<bean id="workflow-notifymylutece.notificationTypeFactory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory">
 		<property name="notificationTypes">
 			<map>
@@ -41,18 +58,15 @@
 	</bean>
 	
 	<!-- Retrieval type -->
-	<bean id="workflow-notifymylutece.retrievalTypeDirectory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeDirectory">
-		<property name="idType" value="1" />
-		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.directory" />
-	</bean>
-	<bean id="workflow-notifymylutece.retrievalTypeUsersList" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeUsersList">
-		<property name="idType" value="2" />
-		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.users_list" />
-	</bean>
-	<bean id="workflow-notifymylutece.retrievalTypeAllUsers" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeAllUsers">
-		<property name="idType" value="3" />
-		<property name="titleKey" value="module.workflow.notifymylutece.retrieval_type.all_users" />
-	</bean>
+	<bean id="workflow-notifymylutece.retrievalTypeDirectory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeDirectory"
+		p:idType="1"
+		p:titleKey="module.workflow.notifymylutece.retrieval_type.directory" />
+	<bean id="workflow-notifymylutece.retrievalTypeUsersList" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeUsersList"
+		p:idType="2"
+		p:titleKey="module.workflow.notifymylutece.retrieval_type.users_list" />
+	<bean id="workflow-notifymylutece.retrievalTypeAllUsers" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeAllUsers"
+		p:idType="3"
+		p:titleKey="module.workflow.notifymylutece.retrieval_type.all_users" />
 	<bean id="workflow-notifymylutece.retrievalTypeFactory" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory">
 		<property name="retrievalTypes">
 			<map>
@@ -76,4 +90,3 @@
         </property>
     </bean>
 </beans>
- 	

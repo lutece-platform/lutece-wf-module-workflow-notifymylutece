@@ -54,6 +54,7 @@ public class NotificationTypeDAO implements INotificationTypeDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Integer> load( int nIdTask, Plugin plugin )
     {
         List<Integer> listIdsNotificationType = new ArrayList<Integer>(  );
@@ -76,6 +77,7 @@ public class NotificationTypeDAO implements INotificationTypeDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void insert( int nIdTask, int nIdNotificationType, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -92,6 +94,7 @@ public class NotificationTypeDAO implements INotificationTypeDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void delete( int nIdTask, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );

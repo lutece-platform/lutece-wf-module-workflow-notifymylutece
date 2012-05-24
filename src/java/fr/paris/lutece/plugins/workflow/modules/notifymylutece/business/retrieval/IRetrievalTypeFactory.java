@@ -31,61 +31,34 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.user;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-
-import java.util.List;
+import java.util.Map;
 
 
 /**
  *
- * MyLuteceUserGuidHome
+ * IRetrievalTypeFactory
  *
  */
-public final class MyLuteceUserGuidHome
+public interface IRetrievalTypeFactory
 {
-    private static final String BEAN_MYLUTECE_USER_GUID_DAO = "workflow-notifymylutece.myLuteceUserGuidDAO";
-    private static Plugin _plugin = PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME );
-    private static IMyLuteceUserGuidDAO _dao = (IMyLuteceUserGuidDAO) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
-            BEAN_MYLUTECE_USER_GUID_DAO );
+    /**
+    * Set the retrieval types
+    * @param mapRetrievalTypes the retrieval types
+    */
+    void setRetrievalTypes( Map<String, IRetrievalType> mapRetrievalTypes );
 
     /**
-     * Private constructor
+     * Get the retrieval type
+     * @return a map of (id_retrieval_type, {@link IRetrievalType}
      */
-    private MyLuteceUserGuidHome(  )
-    {
-    }
+    Map<String, IRetrievalType> getRetrievalTypes(  );
 
     /**
-     * Find the list of User guid associated to the task
-     * @param nIdTask the id task
-     * @return the list of User Guid
+     * Get the retrieval type
+     * @param nIdRetrievalType the id retrieval type
+     * @return a {@link RetrievalType}
      */
-    public static List<String> find( int nIdTask )
-    {
-        return _dao.load( nIdTask, _plugin );
-    }
-
-    /**
-     * Create an association user guid - task
-     * @param nIdTask the id task
-     * @param strUserGuid the user guid
-     */
-    public static void create( int nIdTask, String strUserGuid )
-    {
-        _dao.insert( nIdTask, strUserGuid, _plugin );
-    }
-
-    /**
-     * Remove the associations user guid - task
-     * @param nIdTask the id task
-     */
-    public static void remove( int nIdTask )
-    {
-        _dao.delete( nIdTask, _plugin );
-    }
+    IRetrievalType getRetrievalType( int nIdRetrievalType );
 }

@@ -50,6 +50,7 @@ public class RetrievalTypeUsersList extends AbstractRetrievalType
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
     {
         return config.getListUserGuid(  );
@@ -58,6 +59,7 @@ public class RetrievalTypeUsersList extends AbstractRetrievalType
     /**
      * {@inheritDoc}
      */
+    @Override
     public String checkConfigData( HttpServletRequest request )
     {
         return null;

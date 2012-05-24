@@ -36,7 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.INotificationType;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalTypeFactory;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -233,9 +235,11 @@ public class TaskNotifyMyLuteceConfig
 
         if ( ( _listIdsRetrievalType != null ) && !_listIdsRetrievalType.isEmpty(  ) )
         {
+            IRetrievalTypeFactory factory = SpringContextService.getBean( RetrievalTypeFactory.BEAN_FACTORY );
+
             for ( int nIdRetrievalType : _listIdsRetrievalType )
             {
-                listRetrievalTypes.add( RetrievalTypeFactory.getFactory(  ).getRetrievalType( nIdRetrievalType ) );
+                listRetrievalTypes.add( factory.getRetrievalType( nIdRetrievalType ) );
             }
         }
 

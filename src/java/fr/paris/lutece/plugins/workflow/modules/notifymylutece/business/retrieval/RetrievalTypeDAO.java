@@ -54,6 +54,7 @@ public class RetrievalTypeDAO implements IRetrievalTypeDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Integer> load( int nIdTask, Plugin plugin )
     {
         List<Integer> listIdsRetrievalType = new ArrayList<Integer>(  );
@@ -76,6 +77,7 @@ public class RetrievalTypeDAO implements IRetrievalTypeDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void insert( int nIdTask, int nIdRetrievalType, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -92,6 +94,7 @@ public class RetrievalTypeDAO implements IRetrievalTypeDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void delete( int nIdTask, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );

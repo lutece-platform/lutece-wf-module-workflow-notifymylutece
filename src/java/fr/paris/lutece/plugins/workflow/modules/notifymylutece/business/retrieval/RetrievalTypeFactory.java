@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.HashMap;
@@ -45,41 +44,24 @@ import java.util.Map;
  * RetrievalTypeFactory
  *
  */
-public final class RetrievalTypeFactory
+public final class RetrievalTypeFactory implements IRetrievalTypeFactory
 {
-    private static final String BEAN_NOTIFYMYLUTECE_RETRIEVAL_TYPE_FACTORY = "workflow-notifymylutece.retrievalTypeFactory";
+    public static final String BEAN_FACTORY = "workflow-notifymylutece.retrievalTypeFactory";
     private Map<String, IRetrievalType> _mapRetrievalTypes;
 
     /**
-     * Private constructor
+     * {@inheritDoc}
      */
-    private RetrievalTypeFactory(  )
-    {
-    }
-
-    /**
-     * Get the factory
-     * @return the factory
-     */
-    public static RetrievalTypeFactory getFactory(  )
-    {
-        return (RetrievalTypeFactory) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
-            BEAN_NOTIFYMYLUTECE_RETRIEVAL_TYPE_FACTORY );
-    }
-
-    /**
-     * Set the retrieval types
-     * @param mapRetrievalTypes the retrieval types
-     */
+    @Override
     public void setRetrievalTypes( Map<String, IRetrievalType> mapRetrievalTypes )
     {
         _mapRetrievalTypes = mapRetrievalTypes;
     }
 
     /**
-     * Get the retrieval type
-     * @return a map of (id_retrieval_type, {@link IRetrievalType}
+     * {@inheritDoc}
      */
+    @Override
     public Map<String, IRetrievalType> getRetrievalTypes(  )
     {
         if ( _mapRetrievalTypes == null )
@@ -91,10 +73,9 @@ public final class RetrievalTypeFactory
     }
 
     /**
-     * Get the retrieval type
-     * @param nIdRetrievalType the id retrieval type
-     * @return a {@link RetrievalType}
+     * {@inheritDoc}
      */
+    @Override
     public IRetrievalType getRetrievalType( int nIdRetrievalType )
     {
         if ( _mapRetrievalTypes == null )

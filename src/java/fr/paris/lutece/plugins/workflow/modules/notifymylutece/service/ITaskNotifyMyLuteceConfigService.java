@@ -31,50 +31,53 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
 
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
 
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
  *
- * RetrievalTypeUsersList
+ * ITaskNotifyMyLuteceConfigService
  *
  */
-public class RetrievalTypeAllUsers extends AbstractRetrievalType
+public interface ITaskNotifyMyLuteceConfigService
 {
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
-    {
-        List<String> listUserGuid = new ArrayList<String>(  );
-
-        for ( LuteceUser user : SecurityService.getInstance(  ).getUsers(  ) )
-        {
-            if ( user != null )
-            {
-                listUserGuid.add( user.getName(  ) );
-            }
-        }
-
-        return listUserGuid;
-    }
+    * Create a new config
+    * @param config the config
+    */
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void create( TaskNotifyMyLuteceConfig config );
 
     /**
-     * {@inheritDoc}
+     * Update a config
+     * @param config the config
      */
-    @Override
-    public String checkConfigData( HttpServletRequest request )
-    {
-        return null;
-    }
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void update( TaskNotifyMyLuteceConfig config );
+
+    /**
+     * Remove a config
+     * @param nIdTask the task id
+     */
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void remove( int nIdTask );
+
+    /**
+     * Find a config
+     * @param nIdTask the id task
+     * @return an instance of {@link TaskNotifyMyLuteceConfig}
+     */
+    TaskNotifyMyLuteceConfig findByPrimaryKey( int nIdTask );
+
+    /**
+     * Get all configs
+     * @return a list of {@link TaskNotifyMyLuteceConfig}
+     */
+    List<TaskNotifyMyLuteceConfig> findAll(  );
 }

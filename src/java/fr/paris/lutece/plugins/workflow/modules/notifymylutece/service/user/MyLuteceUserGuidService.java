@@ -31,61 +31,56 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user;
 
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.user.IMyLuteceUserGuidDAO;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
-import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 
 /**
  *
- * NotificationTypeHome
+ * MyLuteceUserGuidService
  *
  */
-public final class NotificationTypeHome
+public class MyLuteceUserGuidService implements IMyLuteceUserGuidService
 {
-    private static final String BEAN_NOTIFICATION_TYPE_DAO = "workflow-notifymylutece.notificationTypeDAO";
-    private static Plugin _plugin = PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME );
-    private static INotificationTypeDAO _dao = (INotificationTypeDAO) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
-            BEAN_NOTIFICATION_TYPE_DAO );
+    public static final String BEAN_SERVICE = "workflow-notifymylutece.myLuteceUserGuidService";
+    @Inject
+    private IMyLuteceUserGuidDAO _myLuteceUserGuidDAO;
 
     /**
-     * Private constructor
+     * {@inheritDoc}
      */
-    private NotificationTypeHome(  )
+    @Override
+    public List<String> find( int nIdTask )
     {
+        return _myLuteceUserGuidDAO.load( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
     }
 
     /**
-     * Find the list of id notification type for a task
-     * @param nIdTask the id task
-     * @return the list of id notification type
+     * {@inheritDoc}
      */
-    public static List<Integer> find( int nIdTask )
+    @Override
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    public void create( int nIdTask, String strUserGuid )
     {
-        return _dao.load( nIdTask, _plugin );
+        _myLuteceUserGuidDAO.insert( nIdTask, strUserGuid, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
     }
 
     /**
-     * Create an association notification type - task
-     * @param nIdTask the id task
-     * @param nIdNotificationType the id notification type
+     * {@inheritDoc}
      */
-    public static void create( int nIdTask, int nIdNotificationType )
+    @Override
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    public void remove( int nIdTask )
     {
-        _dao.insert( nIdTask, nIdNotificationType, _plugin );
-    }
-
-    /**
-     * Remove the associations notification type - task
-     * @param nIdTask the id task
-     */
-    public static void remove( int nIdTask )
-    {
-        _dao.delete( nIdTask, _plugin );
+        _myLuteceUserGuidDAO.delete( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
     }
 }

@@ -31,61 +31,39 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.retrieval;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
 /**
  *
- * RetrievalTypeHome
+ * IRetrievalTypeService
  *
  */
-public final class RetrievalTypeHome
+public interface IRetrievalTypeService
 {
-    private static final String BEAN_RETRIEVAL_TYPE_DAO = "workflow-notifymylutece.retrievalTypeDAO";
-    private static Plugin _plugin = PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME );
-    private static IRetrievalTypeDAO _dao = (IRetrievalTypeDAO) SpringContextService.getPluginBean( NotifyMyLutecePlugin.PLUGIN_NAME,
-            BEAN_RETRIEVAL_TYPE_DAO );
-
     /**
-     * Private constructor
-     */
-    private RetrievalTypeHome(  )
-    {
-    }
-
-    /**
-     * Find the list of id retrieval type associated to the task
-     * @param nIdTask the id task
-     * @return a list of id retrieval type
-     */
-    public static List<Integer> find( int nIdTask )
-    {
-        return _dao.load( nIdTask, _plugin );
-    }
+    * Find the list of id retrieval type associated to the task
+    * @param nIdTask the id task
+    * @return a list of id retrieval type
+    */
+    List<Integer> find( int nIdTask );
 
     /**
      * Create an association retrieval type - task
      * @param nIdTask the id task
      * @param nIdRetrievalType the id retrieval type
      */
-    public static void create( int nIdTask, int nIdRetrievalType )
-    {
-        _dao.insert( nIdTask, nIdRetrievalType, _plugin );
-    }
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void create( int nIdTask, int nIdRetrievalType );
 
     /**
      * Remove the associations retrieval type - task
      * @param nIdTask the id task
      */
-    public static void remove( int nIdTask )
-    {
-        _dao.delete( nIdTask, _plugin );
-    }
+    @Transactional( "workflow-notifymylutece.transactionManager" )
+    void remove( int nIdTask );
 }

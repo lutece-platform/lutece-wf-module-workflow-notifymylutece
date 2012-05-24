@@ -54,6 +54,7 @@ public class MyLuteceUserGuidDAO implements IMyLuteceUserGuidDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void insert( int nIdTask, String strUserGuid, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -70,6 +71,7 @@ public class MyLuteceUserGuidDAO implements IMyLuteceUserGuidDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<String> load( int nIdTask, Plugin plugin )
     {
         List<String> listUserGuid = new ArrayList<String>(  );
@@ -92,6 +94,7 @@ public class MyLuteceUserGuidDAO implements IMyLuteceUserGuidDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void delete( int nIdTask, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );

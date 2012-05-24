@@ -35,13 +35,15 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retriev
 
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceService;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.INotifyMyLuteceService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,13 +55,17 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RetrievalTypeDirectory extends AbstractRetrievalType
 {
+    @Inject
+    private INotifyMyLuteceService _notifyMyLuteceService;
+
     /**
     * {@inheritDoc}
     */
+    @Override
     public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
     {
         List<String> listReceivers = new ArrayList<String>(  );
-        listReceivers.add( NotifyMyLuteceService.getService(  ).getReceiver( config, nIdRecord, nIdDirectory ) );
+        listReceivers.add( _notifyMyLuteceService.getReceiver( config, nIdRecord, nIdDirectory ) );
 
         return listReceivers;
     }
@@ -67,6 +73,7 @@ public class RetrievalTypeDirectory extends AbstractRetrievalType
     /**
      * {@inheritDoc}
      */
+    @Override
     public String checkConfigData( HttpServletRequest request )
     {
         // First check if the user has checked this retrieval type
