@@ -53,6 +53,7 @@ import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributes
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -69,12 +70,14 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -93,7 +96,8 @@ public final class NotifyMyLuteceService implements INotifyMyLuteceService
 
     // SERVICES
     @Inject
-    private ITaskNotifyMyLuteceConfigService _taskNotifyMyLuteceConfigService;
+    @Named( TaskNotifyMyLuteceConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskNotifyMyLuteceConfigService;
     @Inject
     private ITaskService _taskService;
     @Inject
@@ -283,7 +287,7 @@ public final class NotifyMyLuteceService implements INotifyMyLuteceService
             {
                 if ( ( user != null ) &&
                         ( ( config == null ) || ( config.getListUserGuid(  ) == null ) ||
-                        !config.getListUserGuid(  ).contains( user.getName(  ) ) ) )
+                        !Arrays.asList( config.getListUserGuid(  ) ).contains( user.getName(  ) ) ) )
                 {
                     refAvailableUser.addItem( user.getName(  ), user.getName(  ) );
                 }

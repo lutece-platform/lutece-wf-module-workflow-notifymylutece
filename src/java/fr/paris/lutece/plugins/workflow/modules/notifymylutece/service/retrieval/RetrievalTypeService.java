@@ -68,7 +68,7 @@ public class RetrievalTypeService implements IRetrievalTypeService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     public void create( int nIdTask, int nIdRetrievalType )
     {
         _retrievalTypeDAO.insert( nIdTask, nIdRetrievalType, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
@@ -78,7 +78,7 @@ public class RetrievalTypeService implements IRetrievalTypeService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     public void remove( int nIdTask )
     {
         _retrievalTypeDAO.delete( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );

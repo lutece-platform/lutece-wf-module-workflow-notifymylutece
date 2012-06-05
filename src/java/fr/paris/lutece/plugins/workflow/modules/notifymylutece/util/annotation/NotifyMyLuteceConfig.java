@@ -31,53 +31,47 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.annotation;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.validation.NotifyMyLuteceConfigValidator;
 
-import org.springframework.transaction.annotation.Transactional;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-
+import javax.validation.Constraint;
+import javax.validation.Payload;
 
 /**
  *
- * ITaskNotifyMyLuteceConfigService
+ * This annotation is used to add a validation constraint
+ * on class level of the class TaskNotifyCRMConfig.
  *
  */
-public interface ITaskNotifyMyLuteceConfigService
+@Target( ElementType.TYPE )
+@Retention( RetentionPolicy.RUNTIME )
+@Constraint( validatedBy = NotifyMyLuteceConfigValidator.class )
+@Documented
+public @interface NotifyMyLuteceConfig
 {
     /**
-    * Create a new config
-    * @param config the config
-    */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
-    void create( TaskNotifyMyLuteceConfig config );
-
-    /**
-     * Update a config
-     * @param config the config
+     * Message of the annotation
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
-    void update( TaskNotifyMyLuteceConfig config );
-
+    String message(  ) default "The task is not well configured.";
     /**
-     * Remove a config
-     * @param nIdTask the task id
+     * Group parameters
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
-    void remove( int nIdTask );
-
+    Class<?>[] groups(  ) default 
+    {
+    }
+    ;
     /**
-     * Find a config
-     * @param nIdTask the id task
-     * @return an instance of {@link TaskNotifyMyLuteceConfig}
+     * Payload
      */
-    TaskNotifyMyLuteceConfig findByPrimaryKey( int nIdTask );
-
-    /**
-     * Get all configs
-     * @return a list of {@link TaskNotifyMyLuteceConfig}
-     */
-    List<TaskNotifyMyLuteceConfig> findAll(  );
+    Class<?extends Payload>[] payload(  ) default 
+    {
+    }
+    ;
 }

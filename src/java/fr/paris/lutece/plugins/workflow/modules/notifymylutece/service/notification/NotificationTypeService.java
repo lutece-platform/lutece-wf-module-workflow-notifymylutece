@@ -68,7 +68,7 @@ public class NotificationTypeService implements INotificationTypeService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     public void create( int nIdTask, int nIdNotificationType )
     {
         _notificationTypeDAO.insert( nIdTask, nIdNotificationType,
@@ -79,7 +79,7 @@ public class NotificationTypeService implements INotificationTypeService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     public void remove( int nIdTask )
     {
         _notificationTypeDAO.delete( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );

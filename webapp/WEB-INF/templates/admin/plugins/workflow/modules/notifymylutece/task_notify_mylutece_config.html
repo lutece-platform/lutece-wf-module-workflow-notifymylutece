@@ -1,16 +1,16 @@
 <#include "/admin/util/editor/editor.html" />
 
-<#assign sender_name = default_sender_name>
+<#assign senderName = default_sender_name>
 <#assign subject = "">
 <#assign message = "">
-<#assign position_entry_directory_user_guid = -1>
-<#assign id_directory = -1>
+<#assign positionEntryDirectoryUserGuid = -1>
+<#assign idDirectory = -1>
 <#if config?exists>
-	<#assign sender_name = config.senderName>
-	<#assign subject = config.subject>
-	<#assign message = config.message>
-	<#assign position_entry_directory_user_guid = config.positionEntryDirectoryUserGuid>
-	<#assign id_directory = config.idDirectory>
+	<#assign senderName = config.senderName!>
+	<#assign subject = config.subject!>
+	<#assign message = config.message!>
+	<#assign positionEntryDirectoryUserGuid = config.positionEntryDirectoryUserGuid!>
+	<#assign idDirectory = config.idDirectory!>
 </#if>
 
 <#function isNotify config id_notification_type>
@@ -39,7 +39,7 @@
 <div class="highlight-box">
 	<#if notification_types?? && notification_types?has_content>
 		<p>
-			<label for="notification_type">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} * :</label>
+			<label for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} * :</label>
 			<#assign is_first = true>
 			<#list notification_types?keys as id_notification_type>
 				<#if !is_first>
@@ -48,7 +48,7 @@
 					<#assign is_first = false>
 				</#if>
 				<#assign notification_type = notification_types[id_notification_type]>
-				<input type="checkbox" name="notification_type" value="${id_notification_type}"
+				<input type="checkbox" name="listIdsNotificationType" value="${id_notification_type}"
 					<#if config?? && isNotify( config, id_notification_type )>
 						checked="checked"
 					</#if>
@@ -62,10 +62,10 @@
 	</#if>
 	<#if retrieval_types?? && retrieval_types?has_content>
 		<p>
-			<label for="retrieval_type">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} * :</label>
+			<label for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} * :</label>
 			<#list retrieval_types?keys as id_retrieval_type>
 				<#assign retrieval_type = retrieval_types[id_retrieval_type]>
-				<input type="checkbox" name="retrieval_type" value="${id_retrieval_type}"
+				<input type="checkbox" name="listIdsRetrievalType" value="${id_retrieval_type}"
 					<#if config?? && isRetrieve( config, id_retrieval_type)>
 						checked="checked"
 					</#if>
@@ -74,13 +74,13 @@
 		</p>
 	</#if>
 	<p>
-		<label for="id_directory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} * :</label>
-		<@combo name="id_directory" items=list_directories default_value=id_directory />
+		<label for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} * :</label>
+		<@combo name="idDirectory" items=list_directories default_value=idDirectory />
 	</p>
 	<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
-		<p id="entry_user_guid">
-			<label for="position_entry_directory_user_guid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
-			<@combo name="position_entry_directory_user_guid" items=list_entries default_value=position_entry_directory_user_guid />&nbsp;
+		<p id="positionEntryDirectoryUserGuid">
+			<label for="positionEntryDirectoryUserGuid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
+			<@combo name="positionEntryDirectoryUserGuid" items=list_entries default_value=positionEntryDirectoryUserGuid />&nbsp;
 			<br/>
 			<label>&nbsp;</label>
 			#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid_comment}

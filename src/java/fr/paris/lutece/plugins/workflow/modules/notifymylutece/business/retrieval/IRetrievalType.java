@@ -38,8 +38,6 @@ import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNoti
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
  *
@@ -90,8 +88,8 @@ public interface IRetrievalType
 
     /**
      * Check if the config data is correctly configured
-     * @param request the HTTP servlet
-     * @return the error message if there is an error
+     * @param config the config
+     * @return true if the config is well set
      */
-    String checkConfigData( HttpServletRequest request );
+    boolean checkConfigData( TaskNotifyMyLuteceConfig config );
 }

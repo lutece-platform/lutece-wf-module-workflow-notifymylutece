@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.retrieval;
 
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -57,13 +59,13 @@ public interface IRetrievalTypeService
      * @param nIdTask the id task
      * @param nIdRetrievalType the id retrieval type
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     void create( int nIdTask, int nIdRetrievalType );
 
     /**
      * Remove the associations retrieval type - task
      * @param nIdTask the id task
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     void remove( int nIdTask );
 }

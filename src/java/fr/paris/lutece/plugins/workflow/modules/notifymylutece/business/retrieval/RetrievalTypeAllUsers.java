@@ -40,8 +40,6 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
  *
@@ -73,8 +71,8 @@ public class RetrievalTypeAllUsers extends AbstractRetrievalType
      * {@inheritDoc}
      */
     @Override
-    public String checkConfigData( HttpServletRequest request )
+    public boolean checkConfigData( TaskNotifyMyLuteceConfig config )
     {
-        return null;
+        return true;
     }
 }

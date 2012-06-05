@@ -35,9 +35,8 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retriev
 
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 
+import java.util.Arrays;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -53,15 +52,15 @@ public class RetrievalTypeUsersList extends AbstractRetrievalType
     @Override
     public List<String> getReceiver( TaskNotifyMyLuteceConfig config, int nIdRecord, int nIdDirectory )
     {
-        return config.getListUserGuid(  );
+        return Arrays.asList( config.getListUserGuid(  ) );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String checkConfigData( HttpServletRequest request )
+    public boolean checkConfigData( TaskNotifyMyLuteceConfig config )
     {
-        return null;
+        return true;
     }
 }

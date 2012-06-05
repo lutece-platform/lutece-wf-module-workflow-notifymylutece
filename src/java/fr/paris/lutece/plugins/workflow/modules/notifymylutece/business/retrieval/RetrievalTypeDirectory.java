@@ -36,16 +36,11 @@ package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retriev
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.INotifyMyLuteceService;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -74,45 +69,34 @@ public class RetrievalTypeDirectory extends AbstractRetrievalType
      * {@inheritDoc}
      */
     @Override
-    public String checkConfigData( HttpServletRequest request )
+    public boolean checkConfigData( TaskNotifyMyLuteceConfig config )
     {
         // First check if the user has checked this retrieval type
         boolean bIsRetrievalTypeChecked = false;
-        String[] listRetrievalTypes = request.getParameterValues( NotifyMyLuteceConstants.PARAMETER_RETRIEVAL_TYPE );
 
-        if ( ( listRetrievalTypes != null ) && ( listRetrievalTypes.length > 0 ) )
+        if ( ( config.getListIdsRetrievalType(  ) != null ) && ( config.getListIdsRetrievalType(  ).length > 0 ) )
         {
-            for ( String strRetrievalType : listRetrievalTypes )
+            for ( int nIdRetrievalType : config.getListIdsRetrievalType(  ) )
             {
-                if ( StringUtils.isNotBlank( strRetrievalType ) && StringUtils.isNumeric( strRetrievalType ) )
+                if ( nIdRetrievalType == getIdType(  ) )
                 {
-                    int nIdRetrievalType = Integer.parseInt( strRetrievalType );
+                    bIsRetrievalTypeChecked = true;
 
-                    if ( nIdRetrievalType == getIdType(  ) )
-                    {
-                        bIsRetrievalTypeChecked = true;
-                    }
+                    break;
                 }
             }
         }
 
         if ( bIsRetrievalTypeChecked )
         {
-            String strPositionEntryDirectoryUserGuid = request.getParameter( NotifyMyLuteceConstants.PARAMETER_POSITION_ENTRY_DIRECTORY_USER_GUID );
-            int nPositionEntryDirectoryUserGuid = DirectoryUtils.CONSTANT_ID_NULL;
-
-            if ( StringUtils.isNotBlank( strPositionEntryDirectoryUserGuid ) &&
-                    StringUtils.isNumeric( strPositionEntryDirectoryUserGuid ) )
-            {
-                nPositionEntryDirectoryUserGuid = Integer.parseInt( strPositionEntryDirectoryUserGuid );
-            }
+            int nPositionEntryDirectoryUserGuid = config.getPositionEntryDirectoryUserGuid(  );
 
             if ( nPositionEntryDirectoryUserGuid == DirectoryUtils.CONSTANT_ID_NULL )
             {
-                return NotifyMyLuteceConstants.PROPERTY_LABEL_POSITION_ENTRY_DIRECTORY_USER_GUID;
+                return false;
             }
         }
 
-        return null;
+        return true;
     }
 }

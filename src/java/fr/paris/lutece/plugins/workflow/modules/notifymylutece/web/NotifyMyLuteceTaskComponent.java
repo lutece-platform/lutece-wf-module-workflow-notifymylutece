@@ -33,38 +33,39 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.web;
 
-import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeFactory;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalTypeFactory;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.INotifyMyLuteceService;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.ITaskNotifyMyLuteceConfigService;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.constants.NotifyMyLuteceConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributesManager;
+import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.plugins.workflowcore.web.task.NoFormTaskComponent;
-import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -76,12 +77,16 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
 {
+    // PARAMETERS
+    private static final String PARAMETER_APPLY = "apply";
+
     // TEMPLATE
     private static final String TEMPLATE_TASK_NOTIFY_MYLUTECE_CONFIG = "admin/plugins/workflow/modules/notifymylutece/task_notify_mylutece_config.html";
 
     // SERVICES
     @Inject
-    private ITaskNotifyMyLuteceConfigService _taskNotifyMyLuteceConfigService;
+    @Named( TaskNotifyMyLuteceConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskNotifyMyLuteceConfigService;
     @Inject
     private IWorkflowUserAttributesManager _userAttributesManager;
     @Inject
@@ -95,14 +100,56 @@ public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
     @Override
     public String doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
     {
-        String strError = checkConfigData( request, locale );
+        // In case there are no errors, then the config is created/updated
+        boolean bCreate = false;
+        TaskNotifyMyLuteceConfig config = _taskNotifyMyLuteceConfigService.findByPrimaryKey( task.getId(  ) );
 
-        if ( StringUtils.isBlank( strError ) )
+        if ( config == null )
         {
-            setConfigData( request, task );
+            config = new TaskNotifyMyLuteceConfig(  );
+            config.setIdTask( task.getId(  ) );
+            bCreate = true;
         }
 
-        return strError;
+        try
+        {
+            BeanUtils.populate( config, request.getParameterMap(  ) );
+
+            String strApply = request.getParameter( PARAMETER_APPLY );
+
+            // Check if the AdminUser clicked on "Apply" or on "Save"
+            if ( StringUtils.isEmpty( strApply ) )
+            {
+                String strJspError = this.validateConfig( config, request );
+
+                if ( StringUtils.isNotBlank( strJspError ) )
+                {
+                    return strJspError;
+                }
+            }
+
+            // The method is overrided becaus of the following setter
+            config.setListUserGuid( getSelectedUsers( request, config ) );
+
+            if ( bCreate )
+            {
+                _taskNotifyMyLuteceConfigService.create( config );
+            }
+            else
+            {
+                _taskNotifyMyLuteceConfigService.update( config );
+            }
+        }
+        catch ( IllegalAccessException e )
+        {
+            AppLogService.error( e.getMessage(  ), e );
+        }
+        catch ( InvocationTargetException e )
+        {
+            AppLogService.error( e.getMessage(  ), e );
+        }
+
+        return null;
     }
 
     /**
@@ -163,187 +210,21 @@ public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
     // PRIVATE METHODS
 
     /**
-     * Check the config data
-     * @param request the HTTP request
-     * @param locale the locale
-     * @return error message if there is an error
-     */
-    private String checkConfigData( HttpServletRequest request, Locale locale )
-    {
-        String strError = null;
-
-        // Fetch parameters
-        String strIdDirectory = request.getParameter( NotifyMyLuteceConstants.PARAMETER_ID_DIRECTORY );
-        String strSenderName = request.getParameter( NotifyMyLuteceConstants.PARAMETER_SENDER_NAME );
-        String strSubject = request.getParameter( NotifyMyLuteceConstants.PARAMETER_SUBJECT );
-        String strMessage = request.getParameter( NotifyMyLuteceConstants.PARAMETER_MESSAGE );
-        String strApply = request.getParameter( NotifyMyLuteceConstants.PARAMETER_APPLY );
-        String[] listNotificationTypes = request.getParameterValues( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_TYPE );
-        String[] listRetrievalTypes = request.getParameterValues( NotifyMyLuteceConstants.PARAMETER_RETRIEVAL_TYPE );
-
-        // Check if the AdminUser clicked on "Apply" or on "Save"
-        if ( StringUtils.isEmpty( strApply ) )
-        {
-            int nIdDirectory = DirectoryUtils.CONSTANT_ID_NULL;
-
-            if ( StringUtils.isNotBlank( strIdDirectory ) && StringUtils.isNumeric( strIdDirectory ) )
-            {
-                nIdDirectory = Integer.parseInt( strIdDirectory );
-            }
-
-            // Check the required fields
-            String strRequiredField = StringUtils.EMPTY;
-
-            if ( nIdDirectory == DirectoryUtils.CONSTANT_ID_NULL )
-            {
-                strRequiredField = NotifyMyLuteceConstants.PROPERTY_LABEL_DIRECTORY;
-            }
-            else if ( StringUtils.isBlank( strSenderName ) )
-            {
-                strRequiredField = NotifyMyLuteceConstants.PROPERTY_LABEL_SENDER_NAME;
-            }
-            else if ( StringUtils.isBlank( strSubject ) )
-            {
-                strRequiredField = NotifyMyLuteceConstants.PROPERTY_LABEL_SUBJECT;
-            }
-            else if ( StringUtils.isBlank( strMessage ) )
-            {
-                strRequiredField = NotifyMyLuteceConstants.PROPERTY_LABEL_MESSAGE;
-            }
-            else if ( ( listNotificationTypes == null ) || ( listNotificationTypes.length == 0 ) )
-            {
-                strRequiredField = NotifyMyLuteceConstants.PROPERTY_LABEL_NOTIFICATION_TYPE;
-            }
-            else if ( ( listRetrievalTypes == null ) || ( listRetrievalTypes.length == 0 ) )
-            {
-                strRequiredField = NotifyMyLuteceConstants.PROPERTY_LABEL_RETRIEVAL_TYPE;
-            }
-
-            if ( StringUtils.isBlank( strRequiredField ) )
-            {
-                for ( Entry<String, IRetrievalType> entryRetrievalType : _retrievalTypeFactory.getRetrievalTypes(  )
-                                                                                              .entrySet(  ) )
-                {
-                    strRequiredField = entryRetrievalType.getValue(  ).checkConfigData( request );
-
-                    if ( strRequiredField != null )
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if ( StringUtils.isNotBlank( strRequiredField ) )
-            {
-                Object[] tabRequiredFields = { I18nService.getLocalizedString( strRequiredField, locale ) };
-                strError = AdminMessageService.getMessageUrl( request, NotifyMyLuteceConstants.MESSAGE_MANDATORY_FIELD,
-                        tabRequiredFields, AdminMessage.TYPE_STOP );
-            }
-        }
-
-        return strError;
-    }
-
-    /**
-     * Set the config data
-     * @param request the HTTP request
-     * @param task the task
-     */
-    private void setConfigData( HttpServletRequest request, ITask task )
-    {
-        // Fetch parameters
-        String strIdDirectory = request.getParameter( NotifyMyLuteceConstants.PARAMETER_ID_DIRECTORY );
-        String strPositionEntryDirectoryUserGuid = request.getParameter( NotifyMyLuteceConstants.PARAMETER_POSITION_ENTRY_DIRECTORY_USER_GUID );
-        String strSenderName = request.getParameter( NotifyMyLuteceConstants.PARAMETER_SENDER_NAME );
-        String strSubject = request.getParameter( NotifyMyLuteceConstants.PARAMETER_SUBJECT );
-        String strMessage = request.getParameter( NotifyMyLuteceConstants.PARAMETER_MESSAGE );
-        String[] listNotificationTypes = request.getParameterValues( NotifyMyLuteceConstants.PARAMETER_NOTIFICATION_TYPE );
-        String[] listRetrievalTypes = request.getParameterValues( NotifyMyLuteceConstants.PARAMETER_RETRIEVAL_TYPE );
-
-        int nIdDirectory = DirectoryUtils.CONSTANT_ID_NULL;
-        int nPositionEntryDirectoryUserGuid = DirectoryUtils.CONSTANT_ID_NULL;
-
-        if ( StringUtils.isNotBlank( strIdDirectory ) && StringUtils.isNumeric( strIdDirectory ) )
-        {
-            nIdDirectory = Integer.parseInt( strIdDirectory );
-        }
-
-        if ( StringUtils.isNotBlank( strPositionEntryDirectoryUserGuid ) &&
-                StringUtils.isNumeric( strPositionEntryDirectoryUserGuid ) )
-        {
-            nPositionEntryDirectoryUserGuid = Integer.parseInt( strPositionEntryDirectoryUserGuid );
-        }
-
-        List<Integer> listIdsNotificationType = new ArrayList<Integer>(  );
-
-        if ( ( listNotificationTypes != null ) && ( listNotificationTypes.length > 0 ) )
-        {
-            for ( String strNotificationType : listNotificationTypes )
-            {
-                if ( StringUtils.isNotBlank( strNotificationType ) && StringUtils.isNumeric( strNotificationType ) )
-                {
-                    int nIdNotificationType = Integer.parseInt( strNotificationType );
-                    listIdsNotificationType.add( nIdNotificationType );
-                }
-            }
-        }
-
-        List<Integer> listIdsRetrievalType = new ArrayList<Integer>(  );
-
-        if ( ( listRetrievalTypes != null ) && ( listRetrievalTypes.length > 0 ) )
-        {
-            for ( String strRetrievalType : listRetrievalTypes )
-            {
-                if ( StringUtils.isNotBlank( strRetrievalType ) && StringUtils.isNumeric( strRetrievalType ) )
-                {
-                    int nIdRetrievalType = Integer.parseInt( strRetrievalType );
-                    listIdsRetrievalType.add( nIdRetrievalType );
-                }
-            }
-        }
-
-        // In case there are no errors, then the config is created/updated
-        boolean bCreate = false;
-        TaskNotifyMyLuteceConfig config = _taskNotifyMyLuteceConfigService.findByPrimaryKey( task.getId(  ) );
-
-        if ( config == null )
-        {
-            config = new TaskNotifyMyLuteceConfig(  );
-            config.setIdTask( task.getId(  ) );
-            bCreate = true;
-        }
-
-        config.setIdDirectory( nIdDirectory );
-        config.setPositionEntryDirectoryUserGuid( nPositionEntryDirectoryUserGuid );
-        config.setMessage( StringUtils.isNotBlank( strMessage ) ? strMessage : StringUtils.EMPTY );
-        config.setSenderName( StringUtils.isNotBlank( strSenderName ) ? strSenderName : StringUtils.EMPTY );
-        config.setSubject( StringUtils.isNotBlank( strSubject ) ? strSubject : StringUtils.EMPTY );
-        config.setListIdsNotificationType( listIdsNotificationType );
-        config.setListIdsRetrievalType( listIdsRetrievalType );
-        config.setListUserGuid( getSelectedUsers( request, config ) );
-
-        if ( bCreate )
-        {
-            _taskNotifyMyLuteceConfigService.create( config );
-        }
-        else
-        {
-            _taskNotifyMyLuteceConfigService.update( config );
-        }
-    }
-
-    /**
      * Get the selected users
      * @param request the HTTP request
      * @param config the config
      * @return a list of User Guid
      */
-    private List<String> getSelectedUsers( HttpServletRequest request, TaskNotifyMyLuteceConfig config )
+    private String[] getSelectedUsers( HttpServletRequest request, TaskNotifyMyLuteceConfig config )
     {
         // Init the list of user guid
-        List<String> listUserGuid = config.getListUserGuid(  );
+        List<String> listUserGuid;
 
-        if ( listUserGuid == null )
+        if ( ( config.getListUserGuid(  ) != null ) && ( config.getListUserGuid(  ).length > 0 ) )
+        {
+            listUserGuid = new ArrayList<String>( Arrays.asList( config.getListUserGuid(  ) ) );
+        }
+        else
         {
             listUserGuid = new ArrayList<String>(  );
         }
@@ -373,6 +254,11 @@ public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
             }
         }
 
-        return listUserGuid;
+        if ( ( listUserGuid != null ) && !listUserGuid.isEmpty(  ) )
+        {
+            return listUserGuid.toArray( new String[listUserGuid.size(  )] );
+        }
+
+        return null;
     }
 }

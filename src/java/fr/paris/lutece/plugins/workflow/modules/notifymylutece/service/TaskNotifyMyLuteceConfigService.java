@@ -34,10 +34,12 @@
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service;
 
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfigHome;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.notification.INotificationTypeService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.retrieval.IRetrievalTypeService;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user.IMyLuteceUserGuidService;
+import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
+import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +53,7 @@ import javax.inject.Inject;
  * TaskNotifyMyLuteceConfigService
  *
  */
-public class TaskNotifyMyLuteceConfigService implements ITaskNotifyMyLuteceConfigService
+public class TaskNotifyMyLuteceConfigService extends TaskConfigService
 {
     public static final String BEAN_SERVICE = "workflow-notifymylutece.taskNotifyMyLuteceConfigService";
     @Inject
@@ -65,24 +67,32 @@ public class TaskNotifyMyLuteceConfigService implements ITaskNotifyMyLuteceConfi
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
-    public void create( TaskNotifyMyLuteceConfig config )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
+    public void create( ITaskConfig config )
     {
-        if ( config != null )
+        super.create( config );
+
+        TaskNotifyMyLuteceConfig notifyConfig = getConfigBean( config );
+
+        if ( notifyConfig != null )
         {
-            TaskNotifyMyLuteceConfigHome.create( config );
-
-            for ( int nIdNotificationType : config.getListIdsNotificationType(  ) )
+            for ( int nIdNotificationType : notifyConfig.getListIdsNotificationType(  ) )
             {
-                _notificationTypeService.create( config.getIdTask(  ), nIdNotificationType );
+                if ( nIdNotificationType != WorkflowUtils.CONSTANT_ID_NULL )
+                {
+                    _notificationTypeService.create( config.getIdTask(  ), nIdNotificationType );
+                }
             }
 
-            for ( int nIdRetrievalType : config.getListIdsRetrievalType(  ) )
+            for ( int nIdRetrievalType : notifyConfig.getListIdsRetrievalType(  ) )
             {
-                _retrievalTypeService.create( config.getIdTask(  ), nIdRetrievalType );
+                if ( nIdRetrievalType != WorkflowUtils.CONSTANT_ID_NULL )
+                {
+                    _retrievalTypeService.create( config.getIdTask(  ), nIdRetrievalType );
+                }
             }
 
-            for ( String strUserGuid : config.getListUserGuid(  ) )
+            for ( String strUserGuid : notifyConfig.getListUserGuid(  ) )
             {
                 _myLuteceUserGuidService.create( config.getIdTask(  ), strUserGuid );
             }
@@ -93,31 +103,51 @@ public class TaskNotifyMyLuteceConfigService implements ITaskNotifyMyLuteceConfi
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
-    public void update( TaskNotifyMyLuteceConfig config )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
+    public void update( ITaskConfig config )
     {
-        if ( config != null )
+        super.update( config );
+
+        TaskNotifyMyLuteceConfig notifyConfig = getConfigBean( config );
+
+        if ( notifyConfig != null )
         {
-            TaskNotifyMyLuteceConfigHome.update( config );
             _notificationTypeService.remove( config.getIdTask(  ) );
 
-            for ( int nIdNotificationType : config.getListIdsNotificationType(  ) )
+            if ( ( notifyConfig.getListIdsNotificationType(  ) != null ) &&
+                    ( notifyConfig.getListIdsNotificationType(  ).length > 0 ) )
             {
-                _notificationTypeService.create( config.getIdTask(  ), nIdNotificationType );
+                for ( int nIdNotificationType : notifyConfig.getListIdsNotificationType(  ) )
+                {
+                    if ( nIdNotificationType != WorkflowUtils.CONSTANT_ID_NULL )
+                    {
+                        _notificationTypeService.create( config.getIdTask(  ), nIdNotificationType );
+                    }
+                }
             }
 
             _retrievalTypeService.remove( config.getIdTask(  ) );
 
-            for ( int nIdRetrievalType : config.getListIdsRetrievalType(  ) )
+            if ( ( notifyConfig.getListIdsRetrievalType(  ) != null ) &&
+                    ( notifyConfig.getListIdsRetrievalType(  ).length > 0 ) )
             {
-                _retrievalTypeService.create( config.getIdTask(  ), nIdRetrievalType );
+                for ( int nIdRetrievalType : notifyConfig.getListIdsRetrievalType(  ) )
+                {
+                    if ( nIdRetrievalType != WorkflowUtils.CONSTANT_ID_NULL )
+                    {
+                        _retrievalTypeService.create( config.getIdTask(  ), nIdRetrievalType );
+                    }
+                }
             }
 
             _myLuteceUserGuidService.remove( config.getIdTask(  ) );
 
-            for ( String strUserGuid : config.getListUserGuid(  ) )
+            if ( ( notifyConfig.getListUserGuid(  ) != null ) && ( notifyConfig.getListUserGuid(  ).length > 0 ) )
             {
-                _myLuteceUserGuidService.create( config.getIdTask(  ), strUserGuid );
+                for ( String strUserGuid : notifyConfig.getListUserGuid(  ) )
+                {
+                    _myLuteceUserGuidService.create( config.getIdTask(  ), strUserGuid );
+                }
             }
         }
     }
@@ -126,10 +156,10 @@ public class TaskNotifyMyLuteceConfigService implements ITaskNotifyMyLuteceConfi
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     public void remove( int nIdTask )
     {
-        TaskNotifyMyLuteceConfigHome.remove( nIdTask );
+        super.remove( nIdTask );
         _notificationTypeService.remove( nIdTask );
         _retrievalTypeService.remove( nIdTask );
         _myLuteceUserGuidService.remove( nIdTask );
@@ -139,38 +169,36 @@ public class TaskNotifyMyLuteceConfigService implements ITaskNotifyMyLuteceConfi
      * {@inheritDoc}
      */
     @Override
-    public TaskNotifyMyLuteceConfig findByPrimaryKey( int nIdTask )
+    public <T> T findByPrimaryKey( int nIdTask )
     {
-        TaskNotifyMyLuteceConfig config = TaskNotifyMyLuteceConfigHome.findByPrimaryKey( nIdTask );
+        TaskNotifyMyLuteceConfig config = super.findByPrimaryKey( nIdTask );
 
         if ( config != null )
         {
-            config.setListIdsNotificationType( _notificationTypeService.find( nIdTask ) );
-            config.setListIdsRetrievalType( _retrievalTypeService.find( nIdTask ) );
-            config.setListUserGuid( _myLuteceUserGuidService.find( config.getIdTask(  ) ) );
-        }
+            List<Integer> listIdsNotificationType = _notificationTypeService.find( nIdTask );
 
-        return config;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<TaskNotifyMyLuteceConfig> findAll(  )
-    {
-        List<TaskNotifyMyLuteceConfig> listConfigs = TaskNotifyMyLuteceConfigHome.findAll(  );
-
-        for ( TaskNotifyMyLuteceConfig config : listConfigs )
-        {
-            if ( config != null )
+            if ( ( listIdsNotificationType != null ) && !listIdsNotificationType.isEmpty(  ) )
             {
-                config.setListIdsNotificationType( _notificationTypeService.find( config.getIdTask(  ) ) );
-                config.setListIdsRetrievalType( _retrievalTypeService.find( config.getIdTask(  ) ) );
-                config.setListUserGuid( _myLuteceUserGuidService.find( config.getIdTask(  ) ) );
+                config.setListIdsNotificationType( listIdsNotificationType.toArray( 
+                        new Integer[listIdsNotificationType.size(  )] ) );
+            }
+
+            List<Integer> listIdsRetrievalType = _retrievalTypeService.find( nIdTask );
+
+            if ( ( listIdsRetrievalType != null ) && !listIdsRetrievalType.isEmpty(  ) )
+            {
+                config.setListIdsRetrievalType( listIdsRetrievalType.toArray( 
+                        new Integer[listIdsRetrievalType.size(  )] ) );
+            }
+
+            List<String> listUserGuid = _myLuteceUserGuidService.find( config.getIdTask(  ) );
+
+            if ( ( listUserGuid != null ) && !listUserGuid.isEmpty(  ) )
+            {
+                config.setListUserGuid( listUserGuid.toArray( new String[listUserGuid.size(  )] ) );
             }
         }
 
-        return listConfigs;
+        return (T) config;
     }
 }

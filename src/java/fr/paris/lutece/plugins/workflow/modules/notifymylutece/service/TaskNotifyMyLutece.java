@@ -40,6 +40,7 @@ import fr.paris.lutece.plugins.directory.business.RecordHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -50,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -65,7 +67,8 @@ public class TaskNotifyMyLutece extends SimpleTask
     @Inject
     private IResourceHistoryService _resourceHistoryService;
     @Inject
-    private ITaskNotifyMyLuteceConfigService _taskNotifyMyLuteceConfigService;
+    @Named( TaskNotifyMyLuteceConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskNotifyMyLuteceConfigService;
     @Inject
     private INotifyMyLuteceService _notifyMyLuteceService;
 

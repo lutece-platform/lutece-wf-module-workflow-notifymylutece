@@ -31,56 +31,55 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user;
+package fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.validation;
 
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.user.IMyLuteceUserGuidDAO;
-import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalTypeFactory;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.annotation.NotifyMyLuteceConfig;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Map.Entry;
 
-import java.util.List;
-
-import javax.inject.Inject;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 
 /**
  *
- * MyLuteceUserGuidService
+ * Validator that checks the validity of the configuration.
  *
  */
-public class MyLuteceUserGuidService implements IMyLuteceUserGuidService
+public class NotifyMyLuteceConfigValidator implements ConstraintValidator<NotifyMyLuteceConfig, TaskNotifyMyLuteceConfig>
 {
-    public static final String BEAN_SERVICE = "workflow-notifymylutece.myLuteceUserGuidService";
-    @Inject
-    private IMyLuteceUserGuidDAO _myLuteceUserGuidDAO;
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> find( int nIdTask )
+    public void initialize( NotifyMyLuteceConfig constraintAnnotation )
     {
-        return _myLuteceUserGuidDAO.load( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
-    public void create( int nIdTask, String strUserGuid )
+    public boolean isValid( TaskNotifyMyLuteceConfig config, ConstraintValidatorContext context )
     {
-        _myLuteceUserGuidDAO.insert( nIdTask, strUserGuid, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
-    }
+        boolean bIsValid = true;
+        IRetrievalTypeFactory retrievalTypeFactory = SpringContextService.getBean( RetrievalTypeFactory.BEAN_FACTORY );
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
-    public void remove( int nIdTask )
-    {
-        _myLuteceUserGuidDAO.delete( nIdTask, PluginService.getPlugin( NotifyMyLutecePlugin.PLUGIN_NAME ) );
+        for ( Entry<String, IRetrievalType> entryRetrievalType : retrievalTypeFactory.getRetrievalTypes(  ).entrySet(  ) )
+        {
+            bIsValid = entryRetrievalType.getValue(  ).checkConfigData( config );
+
+            if ( !bIsValid )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

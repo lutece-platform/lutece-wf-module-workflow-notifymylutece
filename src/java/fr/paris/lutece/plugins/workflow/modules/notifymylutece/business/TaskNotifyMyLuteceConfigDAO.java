@@ -33,11 +33,9 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.business;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.util.sql.DAOUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -45,7 +43,7 @@ import java.util.List;
  * TaskNotifyMyLuteceConfigDAO
  *
  */
-public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
+public class TaskNotifyMyLuteceConfigDAO implements ITaskConfigDAO<TaskNotifyMyLuteceConfig>
 {
     private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = " SELECT id_task, id_directory, position_directory_entry_user_guid, sender_name, subject, message " +
         " FROM task_notify_mylutece_cf  WHERE id_task = ? ";
@@ -54,16 +52,14 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
     private static final String SQL_QUERY_UPDATE = "UPDATE task_notify_mylutece_cf SET id_directory = ?, position_directory_entry_user_guid = ?, sender_name = ?, subject = ?, message = ? " +
         " WHERE id_task = ? ";
     private static final String SQL_QUERY_DELETE = " DELETE FROM task_notify_mylutece_cf WHERE id_task = ? ";
-    private static final String SQL_QUERY_FIND_ALL = " SELECT id_task, id_directory, position_directory_entry_user_guid, sender_name, subject, message " +
-        " FROM task_notify_mylutece_cf ";
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( TaskNotifyMyLuteceConfig config, Plugin plugin )
+    public synchronized void insert( TaskNotifyMyLuteceConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, NotifyMyLutecePlugin.getPlugin(  ) );
 
         int nIndex = 1;
 
@@ -82,9 +78,9 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public void store( TaskNotifyMyLuteceConfig config, Plugin plugin )
+    public void store( TaskNotifyMyLuteceConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, NotifyMyLutecePlugin.getPlugin(  ) );
 
         int nIndex = 1;
 
@@ -103,10 +99,10 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public TaskNotifyMyLuteceConfig load( int nIdTask, Plugin plugin )
+    public TaskNotifyMyLuteceConfig load( int nIdTask )
     {
         TaskNotifyMyLuteceConfig config = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, NotifyMyLutecePlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
 
@@ -134,42 +130,12 @@ public class TaskNotifyMyLuteceConfigDAO implements ITaskNotifyMyLuteceConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public void delete( int nIdTask, Plugin plugin )
+    public void delete( int nIdTask )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, NotifyMyLutecePlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<TaskNotifyMyLuteceConfig> loadAll( Plugin plugin )
-    {
-        List<TaskNotifyMyLuteceConfig> configList = new ArrayList<TaskNotifyMyLuteceConfig>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ALL, plugin );
-
-        daoUtil.executeQuery(  );
-
-        int nIndex = 1;
-
-        if ( daoUtil.next(  ) )
-        {
-            TaskNotifyMyLuteceConfig config = new TaskNotifyMyLuteceConfig(  );
-            config.setIdTask( daoUtil.getInt( nIndex++ ) );
-            config.setIdDirectory( daoUtil.getInt( nIndex++ ) );
-            config.setPositionEntryDirectoryUserGuid( daoUtil.getInt( nIndex++ ) );
-            config.setSenderName( daoUtil.getString( nIndex++ ) );
-            config.setSubject( daoUtil.getString( nIndex++ ) );
-            config.setMessage( daoUtil.getString( nIndex++ ) );
-            configList.add( config );
-        }
-
-        daoUtil.free(  );
-
-        return configList;
     }
 }

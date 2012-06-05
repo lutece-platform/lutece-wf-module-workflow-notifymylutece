@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.notification;
 
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -57,13 +59,13 @@ public interface INotificationTypeService
      * @param nIdTask the id task
      * @param nIdNotificationType the id notification type
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     void create( int nIdTask, int nIdNotificationType );
 
     /**
      * Remove the associations notification type - task
      * @param nIdTask the id task
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     void remove( int nIdTask );
 }

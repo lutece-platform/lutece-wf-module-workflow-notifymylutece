@@ -38,10 +38,15 @@ import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notifica
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalType;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.IRetrievalTypeFactory;
 import fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.retrieval.RetrievalTypeFactory;
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.util.annotation.NotifyMyLuteceConfig;
+import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -49,35 +54,24 @@ import java.util.List;
  * TaskNotifyDirectoryConfig
  *
  */
-public class TaskNotifyMyLuteceConfig
+@NotifyMyLuteceConfig
+public class TaskNotifyMyLuteceConfig extends TaskConfig
 {
-    private int _nIdTask;
+    @NotNull
+    @Min( 1 )
     private int _nIdDirectory;
     private int _nPositionEntryDirectoryUserGuid;
-    private List<Integer> _listIdsNotificationType;
-    private List<Integer> _listIdsRetrievalType;
-    private List<String> _listUserGuid;
+    @NotNull
+    private Integer[] _listIdsNotificationType;
+    @NotNull
+    private Integer[] _listIdsRetrievalType;
+    private String[] _listUserGuid;
+    @NotNull
     private String _strSubject;
+    @NotNull
     private String _strMessage;
+    @NotNull
     private String _strSenderName;
-
-    /**
-     * Get the id task
-     * @return id Task
-     */
-    public int getIdTask(  )
-    {
-        return _nIdTask;
-    }
-
-    /**
-     * Set id Task
-     * @param idTask id task
-     */
-    public void setIdTask( int idTask )
-    {
-        _nIdTask = idTask;
-    }
 
     /**
      * Get the id directory
@@ -173,7 +167,7 @@ public class TaskNotifyMyLuteceConfig
      * Set the list of ids notification types
      * @param listIdsNotificationType the list of ids notification type
      */
-    public void setListIdsNotificationType( List<Integer> listIdsNotificationType )
+    public void setListIdsNotificationType( Integer[] listIdsNotificationType )
     {
         _listIdsNotificationType = listIdsNotificationType;
     }
@@ -182,7 +176,7 @@ public class TaskNotifyMyLuteceConfig
      * Get the list of ids of notification type
      * @return the list of ids notification type
      */
-    public List<Integer> getListIdsNotificationType(  )
+    public Integer[] getListIdsNotificationType(  )
     {
         return _listIdsNotificationType;
     }
@@ -195,7 +189,7 @@ public class TaskNotifyMyLuteceConfig
     {
         List<INotificationType> listNotificationTypes = new ArrayList<INotificationType>(  );
 
-        if ( ( _listIdsNotificationType != null ) && !_listIdsNotificationType.isEmpty(  ) )
+        if ( ( _listIdsNotificationType != null ) && ( _listIdsNotificationType.length > 0 ) )
         {
             for ( int nIdNotificationType : _listIdsNotificationType )
             {
@@ -211,7 +205,7 @@ public class TaskNotifyMyLuteceConfig
      * Set the list of ids retrieval type
      * @param listIdsRetrievalType the ids retrieval type
      */
-    public void setListIdsRetrievalType( List<Integer> listIdsRetrievalType )
+    public void setListIdsRetrievalType( Integer[] listIdsRetrievalType )
     {
         _listIdsRetrievalType = listIdsRetrievalType;
     }
@@ -220,7 +214,7 @@ public class TaskNotifyMyLuteceConfig
      * Get the list of ids retrieval type
      * @return the list of ids retrieval type
      */
-    public List<Integer> getListIdsRetrievalType(  )
+    public Integer[] getListIdsRetrievalType(  )
     {
         return _listIdsRetrievalType;
     }
@@ -233,7 +227,7 @@ public class TaskNotifyMyLuteceConfig
     {
         List<IRetrievalType> listRetrievalTypes = new ArrayList<IRetrievalType>(  );
 
-        if ( ( _listIdsRetrievalType != null ) && !_listIdsRetrievalType.isEmpty(  ) )
+        if ( ( _listIdsRetrievalType != null ) && ( _listIdsRetrievalType.length > 0 ) )
         {
             IRetrievalTypeFactory factory = SpringContextService.getBean( RetrievalTypeFactory.BEAN_FACTORY );
 
@@ -250,7 +244,7 @@ public class TaskNotifyMyLuteceConfig
      * Set the list of user guid
      * @param listUserGuid the list of user guid
      */
-    public void setListUserGuid( List<String> listUserGuid )
+    public void setListUserGuid( String[] listUserGuid )
     {
         _listUserGuid = listUserGuid;
     }
@@ -259,7 +253,7 @@ public class TaskNotifyMyLuteceConfig
      * Get the list of user guid
      * @return the list of user guid
      */
-    public List<String> getListUserGuid(  )
+    public String[] getListUserGuid(  )
     {
         return _listUserGuid;
     }

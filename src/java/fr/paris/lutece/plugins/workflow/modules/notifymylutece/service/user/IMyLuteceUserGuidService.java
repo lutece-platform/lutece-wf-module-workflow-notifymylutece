@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user;
 
+import fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLutecePlugin;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -57,13 +59,13 @@ public interface IMyLuteceUserGuidService
      * @param nIdTask the id task
      * @param strUserGuid the user guid
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     void create( int nIdTask, String strUserGuid );
 
     /**
      * Remove the associations user guid - task
      * @param nIdTask the id task
      */
-    @Transactional( "workflow-notifymylutece.transactionManager" )
+    @Transactional( NotifyMyLutecePlugin.BEAN_TRANSACTION_MANAGER )
     void remove( int nIdTask );
 }

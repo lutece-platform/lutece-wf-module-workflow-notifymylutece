@@ -21,9 +21,10 @@
 	<bean id="workflow-notifymylutece.myLuteceUserGuidDAO" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.user.MyLuteceUserGuidDAO"/>
 
 	<!-- Services -->
-	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService"/>
-	<bean id="workflow-notifymylutece.notifyMyLuteceService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceService"/>
-	<bean id="workflow-notifymylutece.notifyMyLuteceWebService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceWebService"/>
+	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLuteceConfigService"
+		p:taskConfigDAO-ref="workflow-notifymylutece.taskNotifyMyLuteceConfigDAO" />
+	<bean id="workflow-notifymylutece.notifyMyLuteceService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceService" />
+	<bean id="workflow-notifymylutece.notifyMyLuteceWebService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.NotifyMyLuteceWebService" />
 	<bean id="workflow-notifymylutece.notificationTypeService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.notification.NotificationTypeService" />
 	<bean id="workflow-notifymylutece.retrievalTypeService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.retrieval.RetrievalTypeService" />
 	<bean id="workflow-notifymylutece.myLuteceUserGuidService" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.user.MyLuteceUserGuidService" />
@@ -33,11 +34,14 @@
 		p:key="taskNotifyMyLutece"
 		p:titleI18nKey="module.workflow.notifymylutece.task_notify_mylutece_title"
 		p:beanName="workflow-notifymylutece.taskNotifyMyLutece"
+		p:configBeanName="workflow-notifymylutece.taskNotifyMyLuteceConfig"
 		p:configRequired="true"
 		p:taskForAutomaticAction="true" />
 	<bean id="workflow-notifymylutece.taskNotifyMyLutece" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.service.TaskNotifyMyLutece" scope="prototype" />
+	<bean id="workflow-notifymylutece.taskNotifyMyLuteceConfig" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.TaskNotifyMyLuteceConfig" scope="prototype" />
 	<bean id="workflow-notifymylutece.notifyMyLuteceTaskComponent" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.web.NotifyMyLuteceTaskComponent"
-		p:taskType-ref="workflow-notifymylutece.taskTypeNotifyMyLutece" />
+		p:taskType-ref="workflow-notifymylutece.taskTypeNotifyMyLutece"
+		p:taskConfigService-ref="workflow-notifymylutece.taskNotifyMyLuteceConfigService" />
 	
 	<!-- Notification type -->
 	<bean id="workflow-notifymylutece.notificationTypeEmail" class="fr.paris.lutece.plugins.workflow.modules.notifymylutece.business.notification.NotificationTypeEmail"
