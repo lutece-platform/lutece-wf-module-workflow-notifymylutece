@@ -76,25 +76,36 @@ public class TaskNotifyMyLuteceConfigService extends TaskConfigService
 
         if ( notifyConfig != null )
         {
-            for ( int nIdNotificationType : notifyConfig.getListIdsNotificationType(  ) )
+            if ( ( notifyConfig.getListIdsNotificationType(  ) != null ) &&
+                    ( notifyConfig.getListIdsNotificationType(  ).length > 0 ) )
             {
-                if ( nIdNotificationType != WorkflowUtils.CONSTANT_ID_NULL )
+                for ( int nIdNotificationType : notifyConfig.getListIdsNotificationType(  ) )
                 {
-                    _notificationTypeService.create( config.getIdTask(  ), nIdNotificationType );
+                    if ( nIdNotificationType != WorkflowUtils.CONSTANT_ID_NULL )
+                    {
+                        _notificationTypeService.create( config.getIdTask(  ), nIdNotificationType );
+                    }
                 }
             }
 
-            for ( int nIdRetrievalType : notifyConfig.getListIdsRetrievalType(  ) )
+            if ( ( notifyConfig.getListIdsRetrievalType(  ) != null ) &&
+                    ( notifyConfig.getListIdsRetrievalType(  ).length > 0 ) )
             {
-                if ( nIdRetrievalType != WorkflowUtils.CONSTANT_ID_NULL )
+                for ( int nIdRetrievalType : notifyConfig.getListIdsRetrievalType(  ) )
                 {
-                    _retrievalTypeService.create( config.getIdTask(  ), nIdRetrievalType );
+                    if ( nIdRetrievalType != WorkflowUtils.CONSTANT_ID_NULL )
+                    {
+                        _retrievalTypeService.create( config.getIdTask(  ), nIdRetrievalType );
+                    }
                 }
             }
 
-            for ( String strUserGuid : notifyConfig.getListUserGuid(  ) )
+            if ( ( notifyConfig.getListUserGuid(  ) != null ) && ( notifyConfig.getListUserGuid(  ).length > 0 ) )
             {
-                _myLuteceUserGuidService.create( config.getIdTask(  ), strUserGuid );
+                for ( String strUserGuid : notifyConfig.getListUserGuid(  ) )
+                {
+                    _myLuteceUserGuidService.create( config.getIdTask(  ), strUserGuid );
+                }
             }
         }
     }
