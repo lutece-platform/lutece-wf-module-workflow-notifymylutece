@@ -89,6 +89,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class NotifyMyLuteceService implements INotifyMyLuteceService
 {
+    /** The Constant BEAN_SERVICE. */
     public static final String BEAN_SERVICE = "workflow-notifymylutece.notifyMyLuteceService";
     private static final String TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION = "admin/plugins/workflow/modules/notifymylutece/task_notify_mylutece_notification.html";
     private List<Integer> _listRefusedEntryTypes;
@@ -347,7 +348,9 @@ public final class NotifyMyLuteceService implements INotifyMyLuteceService
                 continue;
             }
             else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation &&
-                    !recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
+                    ( ( recordField.getField(  ) == null ) ||
+                    StringUtils.isBlank( recordField.getField(  ).getTitle(  ) ) ||
+                    !EntryTypeGeolocation.CONSTANT_ADDRESS.equals( recordField.getField(  ).getTitle(  ) ) ) )
             {
                 continue;
             }
@@ -421,7 +424,7 @@ public final class NotifyMyLuteceService implements INotifyMyLuteceService
             for ( String strReceiver : retrievalType.getReceiver( config, record.getIdRecord(  ),
                     directory.getIdDirectory(  ) ) )
             {
-                Map<String, Object> model = this.fillModel( config, record, directory, strReceiver, request,
+                Map<String, Object> model = fillModel( config, record, directory, strReceiver, request,
                         task.getAction(  ).getId(  ), nIdResourceHistory );
                 HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                             TEMPLATE_TASK_NOTIFY_MYLUTECE_NOTIFICATION, locale, model ).getHtml(  ), locale, model );
