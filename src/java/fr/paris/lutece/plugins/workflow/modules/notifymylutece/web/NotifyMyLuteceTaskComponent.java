@@ -120,7 +120,7 @@ public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
             // Check if the AdminUser clicked on "Apply" or on "Save"
             if ( StringUtils.isEmpty( strApply ) )
             {
-                String strJspError = this.validateConfig( config, request );
+                String strJspError = validateConfig( config, request );
 
                 if ( StringUtils.isNotBlank( strJspError ) )
                 {
@@ -175,8 +175,7 @@ public class NotifyMyLuteceTaskComponent extends NoFormTaskComponent
         model.put( NotifyMyLuteceConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( NotifyMyLuteceConstants.MARK_LOCALE, locale );
         model.put( NotifyMyLuteceConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
-        model.put( NotifyMyLuteceConstants.MARK_TASKS_LIST,
-            _notifyMyLuteceService.getListTasks( task.getAction(  ).getId(  ), locale ) );
+        model.put( NotifyMyLuteceConstants.MARK_TASKS_LIST, _notifyMyLuteceService.getListBelowTasks( task, locale ) );
         model.put( NotifyMyLuteceConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE, _userAttributesManager.isEnabled(  ) );
         model.put( NotifyMyLuteceConstants.MARK_NOTIFICATION_TYPES,
             NotificationTypeFactory.getFactory(  ).getNotificationTypes(  ) );
