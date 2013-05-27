@@ -1,35 +1,16 @@
 <#if config?exists && config.idDirectory!=-1>
-<div class="highlight-box">
-	<br />
-	<p>
-		<label for="senderName">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name} * :</label>
-		
-		<input type="text" name="senderName" id="" size="80" value="${senderName}" maxlength="255"/>		
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name_comment}
-	</p>
-
-  	<p>
-    	<label for="suject">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject} * :</label>
-		<input type="text" name="subject" id="" size="80" value="${subject}" maxlength="255"/>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject_comment}
-	</p>
-	
-	<p>
-		<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * :</label>
-		<div class="editor">
-			<textarea name="message" id="" rows="20" cols="90" class="richtext">${message}</textarea>
-		</div>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message_comment}
-	</p>
+	<label for="senderName">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name} * :</label>
+	<input type="text" name="senderName" id="" size="80" value="${senderName}" maxlength="255"/>		
+	<p class="help-block">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name_comment}</p>
+	<label for="suject">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject} * :</label>
+	<input type="text" name="subject" id="" size="80" value="${subject}" maxlength="255"/>
+	<p class="help-block">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject_comment}</p>
+	<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * :</label>
+	<textarea name="message" id="" rows="20" cols="90" class="richtext">${message}</textarea>
+	<p class="help-block">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message_comment}</p>
 	<fieldset>
 		<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_comment}</legend>
-		<table>
+		<table class="table table-striped table-condensed">
 			<tr>
 				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory}</th>
 				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
@@ -48,11 +29,10 @@
 			</tr>
 		</table>
 	</fieldset>	
-	<br />
 	<#if is_user_attribute_ws_active>
 		<fieldset>
 			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute_comment}</legend>
-			<table>
+			<table class="table table-striped table-condensed">
 				<tr>
 					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_user_attribute}</th>
 					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
@@ -75,12 +55,11 @@
 				</tr>
 			</table>
 		</fieldset>
-		<br />
 	</#if>
 	<#if tasks_list?exists && tasks_list?has_content>
 		<fieldset>
 			<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_tasks_list_comment}</legend>
-			<table>
+			<table class="table table-striped table-condensed">
 				<tr>
 					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_title}</th>
 					<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_type}</th>
@@ -95,11 +74,10 @@
 				</#list>
 			</table>
 		</fieldset>
-		<br />
 	</#if>
 	<fieldset>
 		<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry_directory_comment}</legend>
-		<table>
+		<table class="table table-striped table-condensed">
 	  		<tr>
 	  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_entry}</th>
 	  			<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_freemarker}</th>
@@ -116,6 +94,4 @@
 			  </#list>
 		</table>
 	</fieldset>
-	<br />
-</div>
 </#if>

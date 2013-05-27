@@ -34,63 +34,51 @@
 	</#if>
 	<#return false>
 </#function>
-
-<h2>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.title}</h2>
-<div class="highlight-box">
+<fieldset>
+	<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.title}</legend>
 	<#if notification_types?? && notification_types?has_content>
-		<p>
-			<label for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} * :</label>
+		<label for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} *</label>
 			<#assign is_first = true>
-			<#list notification_types?keys as id_notification_type>
+				<#list notification_types?keys as id_notification_type>
 				<#if !is_first>
-					<label>&nbsp;</label>
+					<label class="checkbox">
 				<#else>
 					<#assign is_first = false>
 				</#if>
 				<#assign notification_type = notification_types[id_notification_type]>
 				<input type="checkbox" name="listIdsNotificationType" value="${id_notification_type}"
-					<#if config?? && isNotify( config, id_notification_type )>
-						checked="checked"
-					</#if>
-				/>&nbsp;${notification_type.getTitle( locale )}
+					<#if config?? && isNotify( config, id_notification_type )> checked="checked"</#if>>&nbsp;${notification_type.getTitle( locale )}
 				<#if notification_type.getComment( locale )?? && notification_type.getComment( locale ) != ''>
 					(${notification_type.getComment( locale )})
 				</#if>
-				<br />
+				</label>
 			</#list>
 		</p>
 	</#if>
 	<#if retrieval_types?? && retrieval_types?has_content>
-		<p>
-			<label for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} * :</label>
-			<#list retrieval_types?keys as id_retrieval_type>
-				<#assign retrieval_type = retrieval_types[id_retrieval_type]>
-				<input type="checkbox" name="listIdsRetrievalType" value="${id_retrieval_type}"
-					<#if config?? && isRetrieve( config, id_retrieval_type)>
-						checked="checked"
-					</#if>
-				/>&nbsp;${retrieval_type.getTitle( locale )}
-			</#list>
-		</p>
+		<label for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} *</label>
+		<#list retrieval_types?keys as id_retrieval_type>
+			<label class="checkbox">
+			<#assign retrieval_type = retrieval_types[id_retrieval_type]>
+			<input type="checkbox" name="listIdsRetrievalType" value="${id_retrieval_type}" <#if config?? && isRetrieve( config, id_retrieval_type)> checked="checked"</#if> >&nbsp;${retrieval_type.getTitle( locale )}
+			</label>
+		</#list>
 	</#if>
-	<p>
-		<label for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} * :</label>
-		<@combo name="idDirectory" items=list_directories default_value=idDirectory />
-	</p>
+	<label for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} *</label>
+	<@combo name="idDirectory" items=list_directories default_value=idDirectory />
 	<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
 		<p id="positionEntryDirectoryUserGuid">
 			<label for="positionEntryDirectoryUserGuid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
 			<@combo name="positionEntryDirectoryUserGuid" items=list_entries default_value=positionEntryDirectoryUserGuid />&nbsp;
-			<br/>
 			<label>&nbsp;</label>
 			#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid_comment}
 		</p>
 	</#if>
-	<p>
-		<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}"/>
-	</p>
+	<button class="btn btn-primary btn-small" type="submit" name="apply">
+		<i class="icon-ok-sign icon-white"></i>&nbsp;#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}
+	</button>
 	<#if config?? && isRetrieve( config, "2" )>
-		<table>
+		<table class="table table-striped table-condensed">
 			<tr>
 				<th>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_available_users}</th>
 				<th>&nbsp;</th>
@@ -111,9 +99,6 @@
 			</tr>
 		</table>
 	</#if>
-	<br />
-</div>
-
+</fieldset>
 <#include "/admin/plugins/workflow/modules/notifymylutece/include/notification_config.html" />
-
 <@initEditor />
