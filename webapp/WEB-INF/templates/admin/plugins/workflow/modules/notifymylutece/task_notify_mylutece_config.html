@@ -37,7 +37,9 @@
 <fieldset>
 	<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.title}</legend>
 	<#if notification_types?? && notification_types?has_content>
-		<label for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} *</label>
+		<div class="control-group">
+			<label class="control-label" for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} *</label>
+			<div class="controls">
 			<#assign is_first = true>
 				<#list notification_types?keys as id_notification_type>
 				<#if !is_first>
@@ -53,28 +55,36 @@
 				</#if>
 				</label>
 			</#list>
-		</p>
+			</div>
+		</div>
 	</#if>
 	<#if retrieval_types?? && retrieval_types?has_content>
-		<label for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} *</label>
-		<#list retrieval_types?keys as id_retrieval_type>
-			<label class="checkbox">
-			<#assign retrieval_type = retrieval_types[id_retrieval_type]>
-			<input type="checkbox" name="listIdsRetrievalType" value="${id_retrieval_type}" <#if config?? && isRetrieve( config, id_retrieval_type)> checked="checked"</#if> >&nbsp;${retrieval_type.getTitle( locale )}
+		<div class="control-group">
+			<label class="control-label"  for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} *</label>
+			<div class="controls">
+			<#list retrieval_types?keys as id_retrieval_type>
+				<label class="checkbox">
+					<#assign retrieval_type = retrieval_types[id_retrieval_type]>
+					<input type="checkbox" name="listIdsRetrievalType" value="${id_retrieval_type}" <#if config?? && isRetrieve( config, id_retrieval_type)> checked="checked"</#if> >&nbsp;${retrieval_type.getTitle( locale )}
 			</label>
-		</#list>
+			</#list>
+			</div>
+		</div>
 	</#if>
-	<label for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} *</label>
-	<@combo name="idDirectory" items=list_directories default_value=idDirectory />
-	<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
-		<p id="positionEntryDirectoryUserGuid">
-			<label for="positionEntryDirectoryUserGuid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
-			<@combo name="positionEntryDirectoryUserGuid" items=list_entries default_value=positionEntryDirectoryUserGuid />&nbsp;
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid_comment}
-		</p>
-	</#if>
-	<button class="btn btn-primary btn-small" type="submit" name="apply">
+	<div class="control-group">
+		<label class="control-label" for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} *</label>
+		<div class="controls">
+		<@combo name="idDirectory" items=list_directories default_value=idDirectory />
+		<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
+				<label for="positionEntryDirectoryUserGuid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
+				<@combo name="positionEntryDirectoryUserGuid" items=list_entries default_value=positionEntryDirectoryUserGuid />&nbsp;
+				<span class="help-text">
+					#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid_comment}
+				</span>
+		</#if>
+		</div>
+	</div>
+	<button class="btn btn-primary btn-small offset2" type="submit" name="apply">
 		<i class="icon-ok-sign icon-white"></i>&nbsp;#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}
 	</button>
 	<#if config?? && isRetrieve( config, "2" )>
