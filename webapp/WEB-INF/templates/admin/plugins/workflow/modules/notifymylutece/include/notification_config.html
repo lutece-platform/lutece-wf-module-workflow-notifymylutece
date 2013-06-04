@@ -1,12 +1,12 @@
 <#if config?exists && config.idDirectory!=-1>
-	<label for="senderName">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name} * :</label>
+	<label for="senderName">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name} * </label>
 	<input type="text" name="senderName" id="" class="input-xlarge" value="${senderName}" maxlength="255"/>		
 	<p class="help-block">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_sender_name_comment}</p>
-	<label for="suject">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject} * :</label>
+	<label for="suject">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject} * </label>
 	<input type="text" name="subject" id="" class="input-xlarge" value="${subject}" maxlength="255"/>
 	<p class="help-block">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_subject_comment}</p>
-	<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * :</label>
-	<textarea name="message" id="" rows="20" cols="90" class="richtext">${message}</textarea>
+	<label for="message">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message} * </label>
+	<textarea name="message" id="" rows="20" style="width:50%;" class="richtext">${message}</textarea>
 	<p class="help-block">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_message_comment}</p>
 	<fieldset>
 		<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_directory_comment}</legend>
