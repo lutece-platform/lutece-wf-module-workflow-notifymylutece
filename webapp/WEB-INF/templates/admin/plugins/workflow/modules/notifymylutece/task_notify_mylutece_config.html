@@ -37,58 +37,68 @@
 <fieldset>
 	<legend>#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.title}</legend>
 	<#if notification_types?? && notification_types?has_content>
-		<div class="control-group">
-			<label class="control-label" for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} *</label>
-			<div class="controls">
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="listIdsNotificationType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_notification_type} *</label>
+			<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 			<#assign is_first = true>
 				<#list notification_types?keys as id_notification_type>
+				<div class="checkbox">	
+					<label>
 				<#if !is_first>
-					<label class="checkbox">
 				<#else>
 					<#assign is_first = false>
 				</#if>
 				<#assign notification_type = notification_types[id_notification_type]>
-				<input type="checkbox" name="listIdsNotificationType" value="${id_notification_type}"
+					<input type="checkbox" name="listIdsNotificationType" value="${id_notification_type}"
 					<#if config?? && isNotify( config, id_notification_type )> checked="checked"</#if>>&nbsp;${notification_type.getTitle( locale )}
-				<#if notification_type.getComment( locale )?? && notification_type.getComment( locale ) != ''>
+					<#if notification_type.getComment( locale )?? && notification_type.getComment( locale ) != ''>
 					(${notification_type.getComment( locale )})
 				</#if>
-				</label>
+					</label>
+				</div>
 			</#list>
 			</div>
 		</div>
 	</#if>
 	<#if retrieval_types?? && retrieval_types?has_content>
-		<div class="control-group">
-			<label class="control-label"  for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} *</label>
-			<div class="controls">
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="listIdsRetrievalType">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_retrieval_type} *</label>
+			<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 			<#list retrieval_types?keys as id_retrieval_type>
-				<label class="checkbox">
+				<div class="checkbox">	
+					<label>
 					<#assign retrieval_type = retrieval_types[id_retrieval_type]>
 					<input type="checkbox" name="listIdsRetrievalType" value="${id_retrieval_type}" <#if config?? && isRetrieve( config, id_retrieval_type)> checked="checked"</#if> >&nbsp;${retrieval_type.getTitle( locale )}
-			</label>
+					</label>
+				</div>
 			</#list>
 			</div>
 		</div>
 	</#if>
-	<div class="control-group">
-		<label class="control-label" for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} *</label>
-		<div class="controls">
-		<div class="input-append">
-			<@combo name="idDirectory" items=list_directories default_value=idDirectory />
-			<button class="btn btn-primary" type="submit" value="apply" name="apply" value="apply" title="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}">
+	<div class="form-group">
+		<label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="idDirectory">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_directory} *</label>
+		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		<div class="input-group">
+			<@comboWithParams name="idDirectory" items=list_directories default_value="idDirectory" additionalParameters="class='form-control input-sm'" />
+			<span class="input-group-btn">
+				<button class="btn btn-primary btn-sm" type="submit" value="apply" name="apply" value="apply" title="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_apply}">
 				<i class="icon-ok icon-white"></i>
-			</button>
+				</button>
+			</span>
 		</div>
-		<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
-				<label for="positionEntryDirectoryUserGuid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
-				<@combo name="positionEntryDirectoryUserGuid" items=list_entries default_value=positionEntryDirectoryUserGuid />&nbsp;
+		</div>
+	</div>
+	<#if config?? && isRetrieve( config, "1" ) && list_entries?? && list_entries?has_content>
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="positionEntryDirectoryUserGuid">#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid} * :</label>
+			<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+				<@comboWithParams name="positionEntryDirectoryUserGuid" items=list_entries default_value="positionEntryDirectoryUserGuid" additionalParameters="class='form-control input-sm'" />&nbsp;
 				<span class="help-text">
 					#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_task_entry_directory_user_guid_comment}
 				</span>
-		</#if>
+			</div>
 		</div>
-	</div>
+	</#if>
 	
 	<#if config?? && isRetrieve( config, "2" )>
 		<table class="table table-striped table-condensed span12">
@@ -99,13 +109,13 @@
 			</tr>
 			<tr>
 				<td>
-					<@comboWithParamsAndLength name="select_users" default_value="" additionalParameters="multiple=\"multiple\" class=\"input-xlarge\"" items=available_users_list max_length=175 />
+					<@comboWithParamsAndLength name="select_users" default_value="" additionalParameters="multiple=\"multiple\" class=\"form-control input-sm\"" items=available_users_list max_length=175 />
 				</td>
-				<td style="margin:auto;position:relative;" ><button class="btn btn-primary" type="submit" name="apply" title="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_select_unselect_users}"><i class="icon-chevron-left icon-white"></i><i class="icon-chevron-right icon-white"></i></button>
+				<td style="margin:auto;position:relative;" ><button class="btn btn-primary" type="submit" name="apply" title="#i18n{module.workflow.notifymylutece.task_notify_mylutece_config.label_select_unselect_users}"><i class="glyphicon glyphicon-chevron-left"></i><i class="glyphicon glyphicon-chevron-right"></i></button>
 					</div>
 				</td>
 				<td>
-					<@comboWithParamsAndLength name="unselect_users" default_value="" additionalParameters="multiple=\"multiple\" class=\"input-xlarge\"" items=selected_users_list max_length=175 />
+					<@comboWithParamsAndLength name="unselect_users" default_value="" additionalParameters="multiple=\"multiple\" class=\"form-control input-sm\"" items=selected_users_list max_length=175 />
 				</td>
 			</tr>
 		</table>
